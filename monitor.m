@@ -28,6 +28,7 @@
 -(id) init {
     if (self = [super init]) {
         statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength: NSVariableStatusItemLength];
+        [statusItem setHighlightMode: YES];
 
         statusMenu = [NSMenu new];
         [statusItem setMenu: statusMenu];
@@ -111,7 +112,9 @@
             }
         }
 
-        [statusMenu addItem: menuItem];
+        if (menuItem) {
+            [statusMenu addItem: menuItem];
+        }
     }
 
     if ([statusMenu numberOfItems] > 0) {
