@@ -89,10 +89,11 @@
     [statusMenu removeAllItems];
     [menuCommandMap removeAllObjects];
 
-    NSArray *menuSets = [jsonObject objectForKey: @"menus"];
-    for (NSDictionary *menuSet in menuSets) {
-        NSString *menuItemTitle = [menuSet objectForKey: @"text"];
-        NSString *menuItemCommand = [menuSet objectForKey: @"click"];
+    NSArray *menuObjs = [jsonObject objectForKey: @"menus"];
+    for (NSDictionary *menuObj in menuObjs) {
+        NSString *menuItemTitle = [menuObj objectForKey: @"text"];
+        NSString *menuItemCommand = [menuObj objectForKey: @"click"];
+        NSString *menuItemKeyboard = [menuObj objectForKey: @"keyboard"];
 
         NSMenuItem *menuItem;
         if ([menuItemTitle isEqualToString: @"-"]) {
@@ -101,7 +102,7 @@
         else if ([menuItemTitle length] > 0) {
             menuItem = [[NSMenuItem alloc] initWithTitle: menuItemTitle
                                                   action: nil
-                                           keyEquivalent: @""];
+                                           keyEquivalent: menuItemKeyboard];
             if ([menuItemCommand length] > 0) {
                 [menuItem setTarget: self];
                 [menuItem setAction: @selector(menuAction:)];

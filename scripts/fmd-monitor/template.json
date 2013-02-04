@@ -4,34 +4,42 @@
         {
             "click": "",
             "text": "{{ info1 }}",
+            "keyboard": "",
         },
         {
             "click": "",
             "text": "{{ info2 }}",
+            "keyboard": "",
         },
         {
             "click": "",
-            "text": "{{ info3 }}"
+            "text": "{{ info3 }}",
+            "keyboard": "",
         },
         {
             "click": "/usr/local/bin/fmc toggle",
             "text": "Toggle",
+            "keyboard": "t",
         },
         {
             "click": "/usr/local/bin/fmc skip",
             "text": "Skip",
+            "keyboard": "s",
         },
         {
             "click": "/usr/local/bin/fmc ban",
             "text": "Ban",
+            "keyboard": "b",
         },
         {
             "click": "/usr/local/bin/fmc rate",
             "text": "Rate",
+            "keyboard": "r",
         },
         {
             "click": "/usr/local/bin/fmc unrate",
             "text": "Unrate",
+            "keyboard": "u",
         },
     ],
     "text": "{{ text }}"
