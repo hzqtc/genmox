@@ -1,5 +1,6 @@
 {
-    "image": "{{ icon }}",
+    "image": "{{ image }}",
+    "altimage": "{{ altimage }}",
     "menus": [
         {
             "click": "",

@@ -44,7 +44,8 @@ env = Environment(loader = FileSystemLoader(scriptDir))
 template = env.get_template("template.json")
 print template.render(
         status = status,
-        icon = os.path.join(scriptDir, "%s.png" % status),
+        image = os.path.join(scriptDir, "%s.png" % status),
+        altimage = os.path.join(scriptDir, "%s_neg.png" % status),
         text = text,
         info1 = info1,
         info2 = info2,

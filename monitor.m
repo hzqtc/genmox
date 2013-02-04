@@ -84,7 +84,9 @@
 
     [statusItem setTitle: [jsonObject objectForKey: @"text"]];
     NSString *imagePath = [jsonObject objectForKey: @"image"];
+    NSString *altImagePath = [jsonObject objectForKey: @"altimage"];
     [statusItem setImage: [[NSImage alloc] initWithContentsOfFile: imagePath]];
+    [statusItem setAlternateImage: [[NSImage alloc] initWithContentsOfFile: altImagePath]];
     [statusItem setToolTip: [jsonObject objectForKey: @"tooltip"]];
 
     [statusMenu removeAllItems];
