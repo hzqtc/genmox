@@ -6,6 +6,14 @@ SRC = $(wildcard *.m)
 OBJ = $(SRC:.m=.o)
 TARGET = genmox
 
+all: $(TARGET)
+
+debug: CFLAGS += -g
+debug: $(TARGET)
+
+release: CFLAGS += -O2
+release: $(TARGET)
+
 $(TARGET): $(OBJ)
 	$(CC) $(LDFLAGS) $^ -o $(TARGET)
 
