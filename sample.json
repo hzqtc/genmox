@@ -2,8 +2,16 @@
     "image": "/Users/hzqtc/Downloads/Icons/play.png",
     "menus": [
         {
-            "click": "",
+            "click": "",    // empty click command causes menu item disabled
             "text": "Disabled Menu Text",
+        },
+        {
+            "click": "",
+            "text": "",     // empty item will be ignored
+        },
+        {
+            "click": "",
+            "text": "-",    // this will make a menu separator
         },
         {
             "click": "/bin/sleep 5",

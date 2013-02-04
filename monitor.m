@@ -93,14 +93,21 @@
     for (NSDictionary *menuSet in menuSets) {
         NSString *menuItemTitle = [menuSet objectForKey: @"text"];
         NSString *menuItemCommand = [menuSet objectForKey: @"click"];
-        NSMenuItem *menuItem = [[NSMenuItem alloc] initWithTitle: menuItemTitle
-                                                          action: nil
-                                                   keyEquivalent: @""];
-        if ([menuItemCommand length] > 0) {
-            [menuItem setTarget: self];
-            [menuItem setAction: @selector(menuAction:)];
-            NSNumber *key = [NSNumber numberWithUnsignedInt: [menuItem hash]];
-            [menuCommandMap setObject: menuItemCommand forKey: key];
+
+        NSMenuItem *menuItem;
+        if ([menuItemTitle isEqualToString: @"-"]) {
+            menuItem = [NSMenuItem separatorItem];
+        }
+        else if ([menuItemTitle length] > 0) {
+            menuItem = [[NSMenuItem alloc] initWithTitle: menuItemTitle
+                                                  action: nil
+                                           keyEquivalent: @""];
+            if ([menuItemCommand length] > 0) {
+                [menuItem setTarget: self];
+                [menuItem setAction: @selector(menuAction:)];
+                NSNumber *key = [NSNumber numberWithUnsignedInt: [menuItem hash]];
+                [menuCommandMap setObject: menuItemCommand forKey: key];
+            }
         }
 
         [statusMenu addItem: menuItem];
