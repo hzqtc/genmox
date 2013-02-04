@@ -1,0 +1,15 @@
+{
+    "image": "/Users/hzqtc/Downloads/Icons/play.png",
+    "menus": [
+        {
+            "click": "",
+            "text": "Disabled Menu Text",
+        },
+        {
+            "click": "/bin/sleep 5",
+            "text": "Sleep",
+        }
+    ],
+    "text": "Status Text",
+    "tooltip": "Status Tooltip"
+}
