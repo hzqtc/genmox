@@ -1,0 +1,38 @@
+{
+    "image": "{{ icon }}",
+    "menus": [
+        {
+            "click": "",
+            "text": "{{ info1 }}",
+        },
+        {
+            "click": "",
+            "text": "{{ info2 }}",
+        },
+        {
+            "click": "",
+            "text": "{{ info3 }}"
+        },
+        {
+            "click": "/usr/local/bin/fmc toggle",
+            "text": "Toggle",
+        },
+        {
+            "click": "/usr/local/bin/fmc skip",
+            "text": "Skip",
+        },
+        {
+            "click": "/usr/local/bin/fmc ban",
+            "text": "Ban",
+        },
+        {
+            "click": "/usr/local/bin/fmc rate",
+            "text": "Rate",
+        },
+        {
+            "click": "/usr/local/bin/fmc unrate",
+            "text": "Unrate",
+        },
+    ],
+    "text": "{{ text }}"
+}
