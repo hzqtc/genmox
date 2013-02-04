@@ -16,6 +16,7 @@
             "text": "{{ info3 }}",
             "keyboard": "",
         },
+        {% if status != "error" %}
         {
             "click": "/usr/local/bin/fmc toggle",
             "text": "Toggle",
@@ -41,6 +42,7 @@
             "text": "Unrate",
             "keyboard": "u",
         },
+        {% endif %}
     ],
     "text": "{{ text }}"
 }
