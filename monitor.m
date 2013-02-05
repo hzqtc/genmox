@@ -131,7 +131,6 @@
     NSNumber *key = [NSNumber numberWithUnsignedInt: [sender hash]];
     Command *menuCommand = [[Command alloc] initWithLaunchString: [menuCommandMap objectForKey: key]];
     [menuCommand execute];
-    [self monitorRoutine];
 }
 
 @end
