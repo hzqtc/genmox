@@ -44,7 +44,7 @@ is a JSON string in the following format:
         {
             "click": "/bin/sleep 5",
             "text": "Sleep",
-            "keyboard": "s",    // shortcut key will be ⌘ - S
+            "keyboard": "s",    // shortcut key will be "⌘-S"
         }
     ],
     "text": "Status Text",
@@ -57,7 +57,11 @@ examples, refer to `scrips` directory in the source tree.
 
 GenMoX is fully-customizable through any programming language. It's perfectly
 fine and can be quite useful if you just prepare a static JSON file and run
-GenMoX with: `genmox 100000 "cat static.json"`.
+GenMoX with:
+
+```
+genmox 100000 "cat static.json"
+```
 
 ## Screenshots
 
