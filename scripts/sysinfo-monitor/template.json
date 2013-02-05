@@ -1,0 +1,17 @@
+{
+    "image": "",
+    "altimage": "",
+    "menus": [
+        {
+            "click": "",
+            "text": "{{ cpu }}",
+            "keyboard": "",
+        },
+        {
+            "click": "",
+            "text": "{{ memory }}",
+            "keyboard": "",
+        },
+    ],
+    "text": "{{ text }}"
+}
