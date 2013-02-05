@@ -53,7 +53,7 @@ is a JSON string in the following format:
 ```
 
 The `image`, `altimage`, `tooltip` and `menus` fields can be omitted. For more
-examples, refer to `scrips` directory in the source tree.
+examples, refer to `monitors` directory in the source tree.
 
 GenMoX is fully-customizable through any programming language. It's perfectly
 fine and can be quite useful if you just prepare a static JSON file and run
