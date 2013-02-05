@@ -52,9 +52,8 @@ text = "%sºC".decode("utf-8") % jsonobj["data"]["current_condition"][0]["temp_C
 condition = jsonobj["data"]["current_condition"][0]["weatherDesc"][0]["value"]
 location = jsonobj["data"]["request"][0]["query"]
 desc = "%s: %s" % (location, condition)
-info = "Humidity: %s%%. Precip: %smm. Wind: %s, %s Km/h." % (
+info = "Humidity: %s%%. Wind: %s, %s Km/h." % (
         jsonobj["data"]["current_condition"][0]["humidity"],
-        jsonobj["data"]["current_condition"][0]["precipMM"],
         jsonobj["data"]["current_condition"][0]["winddir16Point"],
         jsonobj["data"]["current_condition"][0]["windspeedKmph"])
 
