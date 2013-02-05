@@ -29,7 +29,7 @@ if s:
         info2 = ""
         info3 = ""
     else:
-        text = "%s / %s" % (timestamp(jsonObj["pos"]), timestamp(jsonObj["len"]))
+        text = "%s/%s" % (timestamp(jsonObj["pos"]), timestamp(jsonObj["len"]))
         info1 = "%s - %s" % (jsonObj["artist"], jsonObj["title"])
         info2 = "%s (%d)" % (jsonObj["album"], jsonObj["year"])
         info3 = "-"
