@@ -25,18 +25,18 @@ def getFMDPlaying():
 
         status = jsonObj["status"]
         if status == "stop":
-            text = "FMD Not Playing"
+            text = "Stopped"
             info1 = ""
             info2 = ""
             info3 = ""
         else:
-            text = "FMD: %s/%s" % (timestamp(jsonObj["pos"]), timestamp(jsonObj["len"]))
-            info1 = "%s - %s" % (jsonObj["artist"], jsonObj["title"])
+            text = "%s/%s" % (timestamp(jsonObj["pos"]), timestamp(jsonObj["len"]))
+            info1 = "FMD: %s - %s" % (jsonObj["artist"], jsonObj["title"])
             info2 = "%s (%d)" % (jsonObj["album"], jsonObj["year"])
             info3 = "-"
     else:
         status = "error"
-        text = "Contact FMD/MPD Failed"
+        text = "Error"
         info1 = ""
         info2 = ""
         info3 = ""
@@ -56,20 +56,20 @@ def getMPDPlaying():
 
         status = dictStatus["state"]
         if status == "stop":
-            text = "MPD Not Playing"
+            text = "Stopped"
             info1 = ""
             info2 = ""
             info3 = ""
         else:
             (pos, length) = dictStatus["time"].split(":")
-            text = "MPD: %s/%s" % (timestamp(int(pos)),
+            text = "%s/%s" % (timestamp(int(pos)),
                     timestamp(int(length)))
-            info1 = "%s - %s" % (dictCurrent["artist"], dictCurrent["title"])
+            info1 = "MPD: %s - %s" % (dictCurrent["artist"], dictCurrent["title"])
             info2 = "%s (%d)" % (dictCurrent["album"], int(dictCurrent["date"]))
             info3 = "-"
     else:
         status = "error"
-        text = "Contact FMD/MPD Failed"
+        text = "Error"
         info1 = ""
         info2 = ""
         info3 = ""
