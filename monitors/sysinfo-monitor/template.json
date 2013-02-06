@@ -9,7 +9,12 @@
         },
         {
             "click": "",
-            "text": "{{ memory }}",
+            "text": "{{ memory1 }}",
+            "keyboard": "",
+        },
+        {
+            "click": "",
+            "text": "{{ memory2 }}",
             "keyboard": "",
         },
     ],
