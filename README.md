@@ -70,8 +70,8 @@ To this end, three monitor scripts have been developed.
 ### FMD Monitor
 
 Display [FMD](https://github.com/hzqtc/fmd) now playing and provide playback
-controlling.  To use this monior, `python`, `jinja2`, `fmd` and `fmc` (optional
-for custom menus) are required.
+controlls. To use this monior, `python`, `jinja2`, `fmd` and `fmc` (optional for
+custom menus) are required.
 
 ![](https://raw.github.com/hzqtc/genmox/master/screenshots/fmd-monitor.png)
 
