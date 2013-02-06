@@ -1,6 +1,6 @@
 {
-    "image": "",
-    "altimage": "",
+    "image": "{{ image }}",
+    "altimage": "{{ altimage }}",
     "menus": [
         {
             "click": "",
