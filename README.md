@@ -11,12 +11,17 @@ When a GenMoX instance is started, it's told to execute a program every few
 seconds. Both program and interval are configurable through command line
 arguments. For example:
 
-```
-genmox 5 "weather-monitor-helper.py Shanghai"
+```bash
+genmox 1800 "weather-monitor-helper.py shanghai"
 ```
 
 The first argument is monitor interval in seconds. The second argument is the
-program to be monitored.
+program to be monitored. So this launch string means: run
+`weather-monitor-helper.py shanghai` every half an hour (1800 seconds).
+
+**Notice:
+the program to be monitored should be put in quotes together with its
+arguments.**
 
 The program to be monitored can be written in any language as long as its output
 is a JSON string in the following format:
@@ -59,7 +64,7 @@ GenMoX is fully-customizable through any programming language. It's perfectly
 fine and can be quite useful if you just prepare a static JSON file and run
 GenMoX with:
 
-```
+```bash
 genmox 100000 "cat static.json"
 ```
 
