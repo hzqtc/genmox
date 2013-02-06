@@ -66,7 +66,7 @@ for forcastobj in jsonobj["data"]["weather"]:
     fcond = forcastobj["weatherDesc"][0]["value"]
     ftempmin = forcastobj["tempMinC"]
     ftempmax = forcastobj["tempMaxC"]
-    fstr = "%s: %s, %sºC~%sºC".decode("utf-8") % (fdate, fcond, ftempmin, ftempmax)
+    fstr = u"%s: %s, %sºC~%sºC" % (fdate, fcond, ftempmin, ftempmax)
     forcasts.append(fstr)
 
 scriptDir = os.path.dirname(os.path.abspath(__file__))
