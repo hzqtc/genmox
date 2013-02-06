@@ -72,13 +72,13 @@ genmox 100000 "cat static.json"
 
 To this end, three monitor scripts have been developed.
 
-### FMD Monitor
+### Now Playing Monitor
 
-Display [FMD](https://github.com/hzqtc/fmd) now playing and provide playback
-controlls. To use this monior, `python`, `jinja2`, `fmd` and `fmc` (optional for
-custom menus) are required.
+Display now playing infomation of [FMD](https://github.com/hzqtc/fmd) or
+[MPD](http://musicpd.org/) and provide basic playback controlls. To use this
+monior, `python`, `jinja2` and `python-mpd2` are required.
 
-![](https://raw.github.com/hzqtc/genmox/master/screenshots/fmd-monitor.png)
+![](https://raw.github.com/hzqtc/genmox/master/screenshots/nowplaying-monitor.png)
 
 ### System Infomation Monitor
 
