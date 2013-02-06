@@ -17,7 +17,7 @@
             "text": "{{ info3 }}",
             "keyboard": "",
         },
-        {% if server == "fmd" %}
+        {% if server == "Fmd" %}
         {
             "click": "/usr/local/bin/fmc toggle",
             "text": "Toggle",
@@ -43,7 +43,7 @@
             "text": "Unrate",
             "keyboard": "u",
         },
-        {% elif server == "mpd" %}
+        {% elif server == "Mpd" %}
         {
             "click": "/usr/local/bin/mpc toggle",
             "text": "Toggle",

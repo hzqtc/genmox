@@ -25,22 +25,19 @@ def getFMDPlaying():
 
         status = jsonObj["status"]
         if status == "stop":
-            text = "Stopped"
             info1 = ""
             info2 = ""
             info3 = ""
         else:
-            text = "%s/%s" % (timestamp(jsonObj["pos"]), timestamp(jsonObj["len"]))
-            info1 = "FMD: %s - %s" % (jsonObj["artist"], jsonObj["title"])
+            info1 = "%s - %s" % (jsonObj["artist"], jsonObj["title"])
             info2 = "%s (%d)" % (jsonObj["album"], jsonObj["year"])
             info3 = "-"
     else:
         status = "error"
-        text = "Error"
         info1 = ""
         info2 = ""
         info3 = ""
-    return (status, text, info1, info2, info3)
+    return (status, info1, info2, info3)
 
 def getMPDPlaying():
     client = mpd.MPDClient()
@@ -56,44 +53,39 @@ def getMPDPlaying():
 
         status = dictStatus["state"]
         if status == "stop":
-            text = "Stopped"
             info1 = ""
             info2 = ""
             info3 = ""
         else:
             (pos, length) = dictStatus["time"].split(":")
-            text = "%s/%s" % (timestamp(int(pos)),
-                    timestamp(int(length)))
-            info1 = "MPD: %s - %s" % (dictCurrent["artist"], dictCurrent["title"])
+            info1 = "%s - %s" % (dictCurrent["artist"], dictCurrent["title"])
             info2 = "%s (%d)" % (dictCurrent["album"], int(dictCurrent["date"]))
             info3 = "-"
     else:
         status = "error"
-        text = "Error"
         info1 = ""
         info2 = ""
         info3 = ""
-    return (status, text, info1, info2, info3)
+    return (status, info1, info2, info3)
 
-(status, text, info1, info2, info3) = getFMDPlaying()
+(status, info1, info2, info3) = getFMDPlaying()
 if status != "error":
-    server = "fmd"
+    server = "Fmd"
 else:
-    (status, text, info1, info2, info3) = getMPDPlaying()
+    (status, info1, info2, info3) = getMPDPlaying()
     if status != "error":
-        server = "mpd"
+        server = "Mpd"
     else:
-        server = "none"
+        server = "Error"
 
 scriptDir = os.path.dirname(os.path.abspath(__file__))
 env = Environment(loader = FileSystemLoader(scriptDir))
 template = env.get_template("template.json")
 print template.render(
         server = server,
-        status = status,
         image = os.path.join(scriptDir, "%s.png" % status),
         altimage = os.path.join(scriptDir, "%s_neg.png" % status),
-        text = text,
+        text = server,
         info1 = info1,
         info2 = info2,
         info3 = info3).encode("utf-8")
