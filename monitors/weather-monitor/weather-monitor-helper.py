@@ -25,7 +25,7 @@ def getImageName(code):
     hour = datetime.datetime.now().hour
     night = hour <= 6 or hour >= 18
     if night and (image == "clear" or image == "lightclouds"):
-        return image + "_night"
+        return image + "night"
     else:
         return image
 
