@@ -79,6 +79,9 @@
             [NSApp terminate: self];
         }
     }
+    else {
+        [NSApp terminate: self];
+    }
 }
 
 -(int) parseCommandOutputInJSON: (NSData *) jsonData {

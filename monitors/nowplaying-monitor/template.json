@@ -17,7 +17,7 @@
             "text": "{{ info3 }}",
             "keyboard": "",
         },
-        {% if status != "error" %}
+        {% if server == "fmd" %}
         {
             "click": "/usr/local/bin/fmc toggle",
             "text": "Toggle",
@@ -42,6 +42,22 @@
             "click": "/usr/local/bin/fmc unrate",
             "text": "Unrate",
             "keyboard": "u",
+        },
+        {% elif server == "mpd" %}
+        {
+            "click": "/usr/local/bin/mpc toggle",
+            "text": "Toggle",
+            "keyboard": "t",
+        },
+        {
+            "click": "/usr/local/bin/mpc next",
+            "text": "Next",
+            "keyboard": "n",
+        },
+        {
+            "click": "/usr/local/bin/mpc prev",
+            "text": "Prev",
+            "keyboard": "p",
         },
         {% endif %}
     ],

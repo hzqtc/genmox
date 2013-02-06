@@ -1,0 +1,3 @@
+#!/bin/bash
+
+./src/genmox 5 monitors/nowplaying-monitor/nowplaying-monitor-helper.py &
