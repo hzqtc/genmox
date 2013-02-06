@@ -5,6 +5,7 @@
     NSTimer *timer;
     NSStatusItem *statusItem;
     NSMenu *statusMenu;
+    NSMenuItem *updateMenuItem;
     NSMenuItem *quitMenuItem;
     NSMutableDictionary *menuCommandMap;
 }
@@ -32,6 +33,10 @@
 
         statusMenu = [NSMenu new];
         [statusItem setMenu: statusMenu];
+        updateMenuItem = [[NSMenuItem alloc] initWithTitle: @"Update Now"
+                                                    action: @selector(updateMenuAction:)
+                                             keyEquivalent: @""];
+        [updateMenuItem setTarget: self];
         quitMenuItem = [[NSMenuItem alloc] initWithTitle: @"Quit"
                                                   action: @selector(terminate:)
                                            keyEquivalent: @"q"];
@@ -50,6 +55,10 @@
 }
 
 -(void) start {
+    [self monitorRoutine];
+}
+
+-(void) updateMenuAction: (id) sender {
     [self monitorRoutine];
 }
 
@@ -122,6 +131,7 @@
     if ([statusMenu numberOfItems] > 0) {
         [statusMenu addItem: [NSMenuItem separatorItem]];
     }
+    [statusMenu addItem: updateMenuItem];
     [statusMenu addItem: quitMenuItem];
 
     return 0;
