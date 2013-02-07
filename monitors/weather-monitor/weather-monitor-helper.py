@@ -51,6 +51,7 @@ jsonobj = json.loads(jsonstr)
 text = "%sºC".decode("utf-8") % jsonobj["data"]["current_condition"][0]["temp_C"]
 condition = jsonobj["data"]["current_condition"][0]["weatherDesc"][0]["value"]
 location = jsonobj["data"]["request"][0]["query"]
+updatetime = "Last update: %s" % (datetime.datetime.now().strftime("%b %d, %H:%M"))
 desc = "%s: %s" % (location, condition)
 info = "Humidity: %s%%. Wind: %s, %s Km/h." % (
         jsonobj["data"]["current_condition"][0]["humidity"],
@@ -76,6 +77,7 @@ print template.render(
         image = os.path.join(scriptDir, "%s.png" % imagename),
         altimage = os.path.join(scriptDir, "%s_neg.png" % imagename),
         text = text,
+        updatetime = updatetime,
         desc = desc,
         info = info,
         tooltip = desc,
