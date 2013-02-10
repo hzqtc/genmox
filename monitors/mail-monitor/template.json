@@ -3,6 +3,16 @@
     "altimage": "{{ altimage }}",
     "menus": [
         {
+            "click": "",
+            "text": "{{ updatetime }}",
+            "keyboard": "",
+        },
+        {
+            "click": "",
+            "text": "-",
+            "keyboard": "",
+        },
+        {
             "click": "/usr/bin/open https://mail.google.com/",
             "text": "Open Gmail",
             "keyboard": "m",
