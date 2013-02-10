@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from jinja2 import Environment, Template, FileSystemLoader
+import datetime
+import jinja2
+import json
 import os
 import sys
-import json
 import urllib
-import datetime
 
 def getImageName(code):
     image = {
@@ -71,7 +71,7 @@ for forcastobj in jsonobj["data"]["weather"]:
     forcasts.append(fstr)
 
 scriptDir = os.path.dirname(os.path.abspath(__file__))
-env = Environment(loader = FileSystemLoader(scriptDir))
+env = jinja2.Environment(loader = jinja2.FileSystemLoader(scriptDir))
 template = env.get_template("template.json")
 print template.render(
         image = os.path.join(scriptDir, "%s.png" % imagename),

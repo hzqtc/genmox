@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 
-from jinja2 import Environment, Template, FileSystemLoader
-import os
+import jinja2
 import json
-import socket
 import mpd
+import os
+import socket
 
 def timestamp(seconds):
     return "%d:%02d" % (seconds / 60, seconds % 60)
@@ -79,7 +79,7 @@ else:
         server = "Error"
 
 scriptDir = os.path.dirname(os.path.abspath(__file__))
-env = Environment(loader = FileSystemLoader(scriptDir))
+env = jinja2.Environment(loader = jinja2.FileSystemLoader(scriptDir))
 template = env.get_template("template.json")
 print template.render(
         server = server,

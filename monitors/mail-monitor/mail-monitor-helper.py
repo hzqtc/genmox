@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
-from jinja2 import Environment, Template, FileSystemLoader
-import os
 import base64
 import imaplib
+import jinja2
+import os
 
 client = imaplib.IMAP4_SSL("imap.gmail.com")
 account = base64.b64decode(open(os.path.expanduser("~/.gmail_account")).read()).split('\n')
@@ -14,7 +14,7 @@ client.close()
 client.logout()
 
 scriptDir = os.path.dirname(os.path.abspath(__file__))
-env = Environment(loader = FileSystemLoader(scriptDir))
+env = jinja2.Environment(loader = jinja2.FileSystemLoader(scriptDir))
 template = env.get_template("template.json")
 print template.render(
         image = os.path.join(scriptDir, "mail.png"),

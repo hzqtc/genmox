@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from jinja2 import Environment, Template, FileSystemLoader
+import jinja2
 import os
 import psutil
 
@@ -27,7 +27,7 @@ memory1 = "Total: %dM; Available: %dM; Used: %dM" % (mtotal, mavailable, mused)
 memory2 = "Wired: %dM; Active: %dM; Inactive: %dM; Free: %dM" % (mwired, mactive, minactive, mfree)
 
 scriptDir = os.path.dirname(os.path.abspath(__file__))
-env = Environment(loader = FileSystemLoader(scriptDir))
+env = jinja2.Environment(loader = jinja2.FileSystemLoader(scriptDir))
 template = env.get_template("template.json")
 print template.render(
         image = os.path.join(scriptDir, "icon.png"),
