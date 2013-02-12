@@ -70,11 +70,11 @@ def getMPDPlaying():
 
 (status, info1, info2, info3) = getFMDPlaying()
 if status != "error":
-    server = "Fmd"
+    server = "fmd"
 else:
     (status, info1, info2, info3) = getMPDPlaying()
     if status != "error":
-        server = "Mpd"
+        server = "mpd"
     else:
         server = "Error"
 
@@ -85,7 +85,7 @@ print template.render(
         server = server,
         image = os.path.join(scriptDir, "%s.png" % status),
         altimage = os.path.join(scriptDir, "%s_neg.png" % status),
-        text = server,
+        text = "",
         info1 = info1,
         info2 = info2,
         info3 = info3).encode("utf-8")
