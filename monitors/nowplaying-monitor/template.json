@@ -2,6 +2,7 @@
     "image": "{{ image }}",
     "altimage": "{{ altimage }}",
     "menus": [
+        {% if status == 'play' or status == 'pause' %}
         {
             "click": "",
             "text": "{{ info1 }}",
@@ -17,6 +18,12 @@
             "text": "{{ info3 }}",
             "keyboard": "",
         },
+        {
+            "click": "",
+            "text": "-",
+            "keyboard": "",
+        },
+        {% endif %}
         {% if server == "fmd" %}
         {
             "click": "/usr/local/bin/fmc toggle",

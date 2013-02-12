@@ -17,6 +17,7 @@ def getFMDPlaying():
         s.close()
         s = None
 
+    (status, artist, title, album, year, pos, length) = ('', '', '', '', '', '0', '0')
     if s:
         s.send("info")
         response = s.recv(4096)
@@ -24,20 +25,16 @@ def getFMDPlaying():
         jsonObj = json.loads(response)
 
         status = jsonObj["status"]
-        if status == "stop":
-            info1 = ""
-            info2 = ""
-            info3 = ""
-        else:
-            info1 = "%s - %s" % (jsonObj["artist"], jsonObj["title"])
-            info2 = "%s (%d)" % (jsonObj["album"], jsonObj["year"])
-            info3 = "-"
+        if status != "stop":
+            artist = jsonObj["artist"]
+            title = jsonObj["title"]
+            album = jsonObj["album"]
+            year = jsonObj["year"]
+            pos = jsonObj["pos"]
+            length = jsonObj["len"]
     else:
         status = "error"
-        info1 = ""
-        info2 = ""
-        info3 = ""
-    return (status, info1, info2, info3)
+    return (status, artist, title, album, year, pos, length)
 
 def getMPDPlaying():
     client = mpd.MPDClient()
@@ -46,46 +43,42 @@ def getMPDPlaying():
     except socket.error:
         client = None
 
+    (status, artist, title, album, year, pos, length) = ('', '', '', '', '', '0', '0')
     if client:
         dictCurrent = client.currentsong()
         dictStatus = client.status()
         client.close()
 
         status = dictStatus["state"]
-        if status == "stop":
-            info1 = ""
-            info2 = ""
-            info3 = ""
-        else:
+        if status != "stop":
+            artist = dictCurrent["artist"]
+            title = dictCurrent["title"]
+            album = dictCurrent["album"]
+            year = dictCurrent["date"]
             (pos, length) = dictStatus["time"].split(":")
-            info1 = "%s - %s" % (dictCurrent["artist"], dictCurrent["title"])
-            info2 = "%s (%d)" % (dictCurrent["album"], int(dictCurrent["date"]))
-            info3 = "-"
     else:
         status = "error"
-        info1 = ""
-        info2 = ""
-        info3 = ""
-    return (status, info1, info2, info3)
+    return (status, artist, title, album, year, pos, length)
 
-(status, info1, info2, info3) = getFMDPlaying()
+(status, artist, title, album, year, pos, length) = getFMDPlaying()
 if status != "error":
     server = "fmd"
 else:
-    (status, info1, info2, info3) = getMPDPlaying()
+    (status, artist, title, album, year, pos, length) = getMPDPlaying()
     if status != "error":
         server = "mpd"
     else:
-        server = "Error"
+        server = "error"
 
 scriptDir = os.path.dirname(os.path.abspath(__file__))
 env = jinja2.Environment(loader = jinja2.FileSystemLoader(scriptDir))
 template = env.get_template("template.json")
 print template.render(
+        status = status,
         server = server,
         image = os.path.join(scriptDir, "%s.png" % status),
         altimage = os.path.join(scriptDir, "%s_neg.png" % status),
         text = "",
-        info1 = info1,
-        info2 = info2,
-        info3 = info3).encode("utf-8")
+        info1 = "%s %s: %s / %s" % (server.upper(), "Playing" if status == "play" else "Paused", timestamp(int(pos)), timestamp(int(length))),
+        info2 = "%s - %s" % (artist, title),
+        info3 = "%s (%s)" % (album, year)).encode("utf-8")
