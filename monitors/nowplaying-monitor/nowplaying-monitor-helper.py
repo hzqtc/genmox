@@ -63,12 +63,15 @@ def getMPDPlaying():
 (status, artist, title, album, year, pos, length) = getFMDPlaying()
 if status != "error":
     server = "fmd"
+    tooltip = "FMD"
 else:
     (status, artist, title, album, year, pos, length) = getMPDPlaying()
     if status != "error":
         server = "mpd"
+        tooltip = "MPD"
     else:
         server = "error"
+        tooltip = "Error"
 
 scriptDir = os.path.dirname(os.path.abspath(__file__))
 env = jinja2.Environment(loader = jinja2.FileSystemLoader(scriptDir))
@@ -79,6 +82,7 @@ print template.render(
         image = os.path.join(scriptDir, "%s.png" % status),
         altimage = os.path.join(scriptDir, "%s_neg.png" % status),
         text = "",
+        tooltip = tooltip,
         info1 = "%s %s: %s / %s" % (server.upper(), "Playing" if status == "play" else "Paused", timestamp(int(pos)), timestamp(int(length))),
         info2 = "%s - %s" % (artist, title),
         info3 = "%s (%s)" % (album, year)).encode("utf-8")
