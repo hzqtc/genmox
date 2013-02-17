@@ -3,8 +3,8 @@
 
 @interface Monitor: NSObject
 
-@property Command *command;
-@property int interval;
+@property (nonatomic) Command *command;
+@property (nonatomic) int interval;
 
 -(id) init;
 -(id) initWithCommand: (Command *) initCommand andInterval: (int) checkInterval;

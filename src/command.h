@@ -2,8 +2,8 @@
 
 @interface Command: NSObject
 
-@property NSString *name;
-@property NSArray *args;
+@property (nonatomic) NSString *name;
+@property (nonatomic) NSArray *args;
 
 -(id) initWithLaunchString: (NSString *) commandString;
 -(NSData *) execute;
