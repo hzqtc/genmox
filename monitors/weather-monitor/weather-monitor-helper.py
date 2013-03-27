@@ -43,7 +43,7 @@ city = sys.argv[1]
 days = 5
 apikey = open(os.path.expanduser("~/.wwo_apikey")).read()
 
-url = "http://free.worldweatheronline.com/feed/weather.ashx?q=%s&format=json&num_of_days=%d&key=%s" % (city, days, apikey)
+url = "http://api.worldweatheronline.com/free/v1/weather.ashx?q=%s&format=json&num_of_days=%d&key=%s" % (city, days, apikey)
 
 jsonstr = urllib.urlopen(url).read()
 jsonobj = json.loads(jsonstr)
