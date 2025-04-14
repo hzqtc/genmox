@@ -4,6 +4,7 @@
 @implementation Monitor {
     NSTimer *timer;
     NSStatusItem *statusItem;
+    NSStatusBarButton *statusBarButton;
     NSMenu *statusMenu;
     NSMenuItem *updateMenuItem;
     NSMenuItem *quitMenuItem;
@@ -29,7 +30,7 @@
 -(id) init {
     if (self = [super init]) {
         statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength: NSVariableStatusItemLength];
-        [statusItem setHighlightMode: YES];
+        statusBarButton = statusItem.button;
 
         statusMenu = [NSMenu new];
         [statusItem setMenu: statusMenu];
@@ -94,12 +95,14 @@
         return -1;
     }
 
-    [statusItem setTitle: [jsonObject objectForKey: @"text"]];
-    NSString *imagePath = [jsonObject objectForKey: @"image"];
-    NSString *altImagePath = [jsonObject objectForKey: @"altimage"];
-    [statusItem setImage: [[NSImage alloc] initWithContentsOfFile: imagePath]];
-    [statusItem setAlternateImage: [[NSImage alloc] initWithContentsOfFile: altImagePath]];
-    [statusItem setToolTip: [jsonObject objectForKey: @"tooltip"]];
+    statusBarButton.title = [jsonObject objectForKey: @"text"];
+    NSImage *image = [[NSImage alloc] initWithContentsOfFile: [jsonObject objectForKey: @"image"]];
+    image.template = YES;
+    NSImage *altImage = [[NSImage alloc] initWithContentsOfFile: [jsonObject objectForKey: @"altimage"]];
+    altImage.template = YES;
+    statusBarButton.image = image;
+    statusBarButton.alternateImage = altImage;
+    statusBarButton.toolTip = [jsonObject objectForKey: @"tooltip"];
 
     [statusMenu removeAllItems];
     [menuCommandMap removeAllObjects];
