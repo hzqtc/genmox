@@ -1,3 +1,0 @@
-#!/bin/bash
-
-./src/genmox 1800 "monitors/weather-monitor/weather-monitor-helper.py tunxi" &

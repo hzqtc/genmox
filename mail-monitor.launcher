@@ -1,3 +1,0 @@
-#!/bin/bash
-
-./src/genmox 600 monitors/mail-monitor/mail-monitor-helper.py &
