@@ -96,6 +96,15 @@ API](http://www.worldweatheronline.com/register.aspx) key and write it in
 
 ![](https://raw.github.com/hzqtc/genmox/master/screenshots/weather-monitor.png)
 
+### World clock
+
+Show the current time in other timezones.
+
+![](https://raw.github.com/hzqtc/genmox/master/screenshots/world-clock.png)
+
+Copy the [plist file](https://raw.github.com/hzqtc/genmox/master/hzqtc.worldclock.plist)
+to `~/Library/LaunchAgents/` to run this monitor on login.
+
 ## Contribute
 
 Patches and monitor scripts are welcomed.
