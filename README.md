@@ -102,7 +102,7 @@ Show the current time in other timezones.
 
 ![](https://raw.github.com/hzqtc/genmox/master/screenshots/world-clock.png)
 
-Copy the [plist file](https://raw.github.com/hzqtc/genmox/master/hzqtc.worldclock.plist)
+Copy the [plist file](https://raw.github.com/hzqtc/genmox/master/monitors/world-clock/hzqtc.worldclock.plist)
 to `~/Library/LaunchAgents/` to run this monitor on login.
 
 ## Contribute
