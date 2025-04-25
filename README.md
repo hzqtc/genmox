@@ -87,15 +87,6 @@ To use this monior, `python`, `jinja2` and `psutil` are required.
 
 ![](https://raw.github.com/hzqtc/genmox/master/screenshots/sysinfo-monitor.png)
 
-### Weather Condition and Forcasts
-
-Display current weather condition and forcasts. To use this monitor, you should
-obtain a [WorldWeatherOnline
-API](http://www.worldweatheronline.com/register.aspx) key and write it in
-`~/.wwo_apikey`. `python` and `jinja2` are required.
-
-![](https://raw.github.com/hzqtc/genmox/master/screenshots/weather-monitor.png)
-
 ### World clock
 
 Show the current time in other timezones.
