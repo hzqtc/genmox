@@ -2,7 +2,14 @@
 
 mpc="/opt/homebrew/bin/mpc"
 if test ! -x "$mpc"; then
-  echo "Error mpc command not found"
+  echo '
+  {
+    "image": "'$(pwd)'/error.png",
+    "altimage": "'$(pwd)'/error_neg.png",
+    "menus": [],
+    "text": "Error mpc command not found"
+  }
+  '
   exit 1
 fi
 
