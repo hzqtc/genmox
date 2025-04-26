@@ -43,22 +43,33 @@ if [[ "$status" != "stopped" ]]; then
   title=${title%.*}
   progress=$(echo "$mpd_status" | grep -Eo "[0-9]{1,2}:[0-9]{2}/[0-9]{1,2}:[0-9]{2}")
   menu_text="$title $progress"
+  current_pos=$(echo "$mpd_status" | grep -Eo "#[0-9]+/[0-9]+")
+  current_pos=${current_pos#\#}
+  current_pos=${current_pos%/*}
 
-
-  queue_menu_items=""
+  plaplaylist_menu_items=""
+  playlist_len=0
   IFS=$'\n'
-  for track in $($mpc playlist -f "%file% (%position%)" | head -n 10); do
-    position=$(echo $track | grep -Eo "\([0-9]+\)")
-    position=${position#(}
-    position=${position%)}
-    queue_menu_items+='
+  for track in $($mpc playlist -f "%file% (%position%)"); do
+    track_pos=$(echo $track | grep -Eo "\([0-9]+\)")
+    track_pos=${track_pos#(}
+    track_pos=${track_pos%)}
+    if [[ $current_pos == $track_pos ]]; then
+      checked=true
+    else
+      checked=false
+    fi
+
+    playlist_menu_items+='
       {
-        "click": "'$mpc' play '$position'",
+        "click": "'$mpc' play '$track_pos'",
         "text": "'${track%.*}'",
         "keyboard": "",
+        "checked": "'$checked'",
       },
     '
-    increment=$((increment + 1))
+
+    playlist_len=$((playlist_len + 1))
   done
 fi
 
@@ -67,7 +78,13 @@ echo '
   {
     "image": "'$(pwd)'/'$status'.png",
     "altimage": "'$(pwd)'/'$status'_neg.png",
-    "menus": ['$queue_menu_items'
+    "menus": [
+      {
+        "click": "",
+        "text": "Playlist Position: '$current_pos'/'$playlist_len'",
+        "keyboard": "",
+        "submenus": ['$playlist_menu_items'],
+      },
       {
         "click": "",
         "text": "-",
@@ -76,22 +93,22 @@ echo '
       {
         "click": "'$mpc' toggle",
         "text": "Toggle",
-        "keyboard": "",
+        "keyboard": "t",
       },
       {
         "click": "'$mpc' stop",
         "text": "Stop",
-        "keyboard": "",
+        "keyboard": "s",
       },
       {
         "click": "'$mpc' next",
         "text": "Next Track",
-        "keyboard": "",
+        "keyboard": "n",
       },
       {
         "click": "'$mpc' prev",
         "text": "Previous Track",
-        "keyboard": "",
+        "keyboard": "p",
       },
       {
         "click": "",
@@ -101,12 +118,12 @@ echo '
       {
         "click": "'$mpc' seek +5",
         "text": "Fast Forward 5s",
-        "keyboard": "",
+        "keyboard": "f",
       },
       {
         "click": "'$mpc' seek -5",
         "text": "Rewind 5s",
-        "keyboard": "",
+        "keyboard": "r",
       },
       {
         "click": "'$mpc' seek +10",

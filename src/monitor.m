@@ -108,10 +108,28 @@
     [menuCommandMap removeAllObjects];
 
     NSArray *menuObjs = [jsonObject objectForKey: @"menus"];
+    NSArray<NSMenuItem *> *menuItems = [self getMenuItems:menuObjs];
+    for (NSMenuItem *item in menuItems) {
+      [statusMenu addItem: item];
+    }
+
+    if ([statusMenu numberOfItems] > 0) {
+        [statusMenu addItem: [NSMenuItem separatorItem]];
+    }
+    [statusMenu addItem: updateMenuItem];
+    [statusMenu addItem: quitMenuItem];
+
+    return 0;
+}
+
+-(NSArray<NSMenuItem *> *) getMenuItems: (NSArray *) menuObjs  {
+    NSMutableArray<NSMenuItem *> *menuItems = [NSMutableArray array];
     for (NSDictionary *menuObj in menuObjs) {
         NSString *menuItemTitle = [menuObj objectForKey: @"text"];
         NSString *menuItemCommand = [menuObj objectForKey: @"click"];
         NSString *menuItemKeyboard = [menuObj objectForKey: @"keyboard"];
+        NSString *menuItemChecked = [menuObj objectForKey: @"checked"];
+        NSArray *submenuObjs = [menuObj objectForKey: @"submenus"];
 
         NSMenuItem *menuItem;
         if ([menuItemTitle isEqualToString: @"-"]) {
@@ -122,25 +140,31 @@
                                                   action: nil
                                            keyEquivalent: menuItemKeyboard];
             if ([menuItemCommand length] > 0) {
-                [menuItem setTarget: self];
-                [menuItem setAction: @selector(menuAction:)];
+                menuItem.target = self;
+                menuItem.action = @selector(menuAction:);
                 NSNumber *key = [NSNumber numberWithUnsignedInt: [menuItem hash]];
                 [menuCommandMap setObject: menuItemCommand forKey: key];
+            }
+
+            if (menuItemChecked && [menuItemChecked caseInsensitiveCompare:@"true"] == NSOrderedSame) {
+                menuItem.state = NSControlStateValueOn;
+            }
+
+            if (submenuObjs && submenuObjs.count > 0) {
+              NSMenu *submenu = [NSMenu new];
+              NSArray<NSMenuItem *> *submenuItems = [self getMenuItems: submenuObjs];
+              for (NSMenuItem *item in submenuItems) {
+                [submenu addItem: item];
+              }
+              menuItem.submenu = submenu;
             }
         }
 
         if (menuItem) {
-            [statusMenu addItem: menuItem];
+            [menuItems addObject: menuItem];
         }
     }
-
-    if ([statusMenu numberOfItems] > 0) {
-        [statusMenu addItem: [NSMenuItem separatorItem]];
-    }
-    [statusMenu addItem: updateMenuItem];
-    [statusMenu addItem: quitMenuItem];
-
-    return 0;
+    return [menuItems copy];
 }
 
 -(void) menuAction: (id) sender {
