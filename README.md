@@ -76,6 +76,10 @@ To this end, three monitor scripts have been developed.
 
 Display now playing infomation [MPD](http://musicpd.org/) and provide basic controlls.
 
+```bash
+genmox 1 $(pwd)/mpd-monitor.sh
+```
+
 ![](https://raw.github.com/hzqtc/genmox/master/screenshots/nowplaying-monitor.png)
 
 ### System Infomation Monitor
@@ -88,6 +92,10 @@ To use this monior, `python`, `jinja2` and `psutil` are required.
 ### World clock
 
 Show the current time in other timezones.
+
+```bash
+genmox 30 $(pwd)/world-clock.sh Asia/Shanghai America/New_York Europe/Zurich
+```
 
 ![](https://raw.github.com/hzqtc/genmox/master/screenshots/world-clock.png)
 
