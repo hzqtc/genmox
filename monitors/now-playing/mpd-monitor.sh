@@ -1,12 +1,12 @@
 #!/bin/bash
 
-mpc=$(which mpc)
-if [[ ! "$mpc" ]]; then
+mpc="/opt/homebrew/bin/mpc"
+if test ! -x "$mpc"; then
   echo "Error mpc command not found"
   exit 1
 fi
 
-mpd_status=$(mpc status -f "%file%" 2>&1)
+mpd_status=$($mpc status -f "%file%" 2>&1)
 if [[ "$mpd_status" =~ "MPD error:" ]]; then
   status="error"
 fi
@@ -40,7 +40,7 @@ if [[ "$status" != "stopped" ]]; then
 
   queue_menu_items=""
   IFS=$'\n'
-  for track in $(mpc playlist -f "%file% (%position%)" | head -n 10); do
+  for track in $($mpc playlist -f "%file% (%position%)" | head -n 10); do
     position=$(echo $track | grep -Eo "\([0-9]+\)")
     position=${position#(}
     position=${position%)}
