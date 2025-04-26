@@ -74,9 +74,7 @@ To this end, three monitor scripts have been developed.
 
 ### Now Playing Monitor
 
-Display now playing infomation of [FMD](https://github.com/hzqtc/fmd) or
-[MPD](http://musicpd.org/) and provide basic playback controlls. To use this
-monior, `python`, `jinja2` and `python-mpd2` are required.
+Display now playing infomation [MPD](http://musicpd.org/) and provide basic controlls.
 
 ![](https://raw.github.com/hzqtc/genmox/master/screenshots/nowplaying-monitor.png)
 
