@@ -7,14 +7,14 @@ if test ! -x "$mpc"; then
     "image": "'$(pwd)'/error.png",
     "altimage": "'$(pwd)'/error_neg.png",
     "menus": [],
-    "text": "Error mpc command not found"
+    "text": "Error mpc not found"
   }
   '
   exit 1
 fi
 
 mpd_status=$($mpc status -f "%file%" 2>&1)
-if [[ "$mpd_status" =~ "MPD error:" ]]; then
+if $(echo "$mpd_status" | grep -iq "error:"); then
   status="error"
 fi
 
@@ -23,8 +23,14 @@ if [[ "$status" == "error" ]]; then
   {
     "image": "'$(pwd)'/error.png",
     "altimage": "'$(pwd)'/error_neg.png",
-    "menus": [],
-    "text": "'$mpd_status'"
+    "menus": [
+      {
+        "click": "/opt/homebrew/bin/brew services restart mpd",
+        "text": "Restart MPD",
+        "keyboard": "d",
+      },
+    ],
+    "text": "MPD error"
   }
   '
   exit 0
@@ -162,6 +168,5 @@ echo '
       },
     ],
     "text": "'$menu_text'"
-  }
-  '
+  }'
 
