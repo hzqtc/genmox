@@ -83,7 +83,7 @@ genmox 1 $(pwd)/mpd-monitor.sh
 
 ![](https://raw.github.com/hzqtc/genmox/master/screenshots/nowplaying-monitor.png)
 
-Copy the [plist file](https://raw.github.com/hzqtc/genmox/master/monitors/nowplaying/hzqtc.nowplaying.plist)
+Copy the [plist file](https://raw.github.com/hzqtc/genmox/master/monitors/now-playing/hzqtc.nowplaying.plist)
 to `~/Library/LaunchAgents/` to run this monitor on login.
 
 ### System Infomation Monitor
