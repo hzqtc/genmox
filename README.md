@@ -74,7 +74,8 @@ To this end, three monitor scripts have been developed.
 
 ### Now Playing Monitor
 
-Display now playing infomation [MPD](http://musicpd.org/) and provide basic controlls.
+Display now playing infomation of [Music Player Daemon](http://musicpd.org/)
+and provide basic controlls.
 
 ```bash
 genmox 1 $(pwd)/mpd-monitor.sh
@@ -82,10 +83,16 @@ genmox 1 $(pwd)/mpd-monitor.sh
 
 ![](https://raw.github.com/hzqtc/genmox/master/screenshots/nowplaying-monitor.png)
 
+Copy the [plist file](https://raw.github.com/hzqtc/genmox/master/monitors/nowplaying/hzqtc.nowplaying.plist)
+to `~/Library/LaunchAgents/` to run this monitor on login.
+
 ### System Infomation Monitor
 
-Display current CPU and memory usage infomation. More can be added if you want.
-To use this monior, `python`, `jinja2` and `psutil` are required.
+Display current CPU and memory usage infomation.
+
+```bash
+genmox 3 $(pwd)/sysinfo.sh
+```
 
 ![](https://raw.github.com/hzqtc/genmox/master/screenshots/sysinfo-monitor.png)
 
