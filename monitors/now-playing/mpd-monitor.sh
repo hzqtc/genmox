@@ -39,51 +39,119 @@ fi
 # if status doesn't contain [playing] or [paused] then mpd is stopped
 if [[ "$mpd_status" =~ \[(playing|paused)\] ]]; then
   status=$(echo "$mpd_status" | grep -Eo "(playing|paused)")
-else
-  status="stopped"
-  menu_text="MPD Stopped"
-fi
-
-if [[ "$status" != "stopped" ]]; then
   title=$(echo "$mpd_status" | head -n 1 )
   title=${title%.*}
   progress=$(echo "$mpd_status" | grep -Eo "[0-9]{1,2}:[0-9]{2}/[0-9]{1,2}:[0-9]{2}")
   menu_text="$title $progress"
+
+  # Current track position in playlist
   current_pos=$(echo "$mpd_status" | grep -Eo "#[0-9]+/[0-9]+")
   current_pos=${current_pos#\#}
   current_pos=${current_pos%/*}
-
-  plaplaylist_menu_items=""
-  playlist_len=0
-  IFS=$'\n'
-  for track in $($mpc playlist -f "%file% (%position%)"); do
-    track_pos=$(echo $track | grep -Eo "\([0-9]+\)")
-    track_pos=${track_pos#(}
-    track_pos=${track_pos%)}
-    if [[ $current_pos == $track_pos ]]; then
-      checked=true
-    else
-      checked=false
-    fi
-
-    playlist_menu_items+='
-      {
-        "click": "'$mpc' play '$track_pos'",
-        "text": "'${track%.*}'",
-        "keyboard": "",
-        "checked": "'$checked'",
-      },
-    '
-
-    playlist_len=$((playlist_len + 1))
-  done
+else
+  status="stopped"
+  menu_text="MPD Stopped"
+  current_pos=0
 fi
 
+# Get the playlist
+plaplaylist_menu_items=""
+playlist_len=0
+IFS=$'\n'
+for track in $($mpc playlist -f "%file% (%position%)"); do
+  track_pos=$(echo $track | grep -Eo "\([0-9]+\)")
+  track_pos=${track_pos#(}
+  track_pos=${track_pos%)}
+  if [[ $current_pos == $track_pos ]]; then
+    checked=true
+  else
+    checked=false
+  fi
+
+  playlist_menu_items+='
+  {
+    "click": "'$mpc' play '$track_pos'",
+    "text": "'${track%.*}'",
+    "keyboard": "",
+    "checked": "'$checked'",
+  },
+  '
+
+  playlist_len=$((playlist_len + 1))
+done
+
+if [[ "$status" == "stopped" ]]; then
+  control_menus='
+    {
+      "click": "",
+      "text": "-",
+      "keyboard": "",
+    },
+    {
+      "click": "'$mpc' play",
+      "text": "Play",
+      "keyboard": "p",
+    },'
+  seek_menus=''
+else
+  control_menus='
+    {
+      "click": "",
+      "text": "-",
+      "keyboard": "",
+    },
+    {
+      "click": "'$mpc' toggle",
+      "text": "Toggle",
+      "keyboard": "t",
+    },
+    {
+      "click": "'$mpc' stop",
+      "text": "Stop",
+      "keyboard": "s",
+    },
+    {
+      "click": "'$mpc' next",
+      "text": "Next Track",
+      "keyboard": "n",
+    },
+    {
+      "click": "'$mpc' prev",
+      "text": "Previous Track",
+      "keyboard": "p",
+    },'
+  seek_menus='
+    {
+      "click": "",
+      "text": "-",
+      "keyboard": "",
+    },
+    {
+      "click": "'$mpc' seek +5",
+      "text": "Fast Forward 5s",
+      "keyboard": "f",
+    },
+    {
+      "click": "'$mpc' seek -5",
+      "text": "Rewind 5s",
+      "keyboard": "r",
+    },
+    {
+      "click": "'$mpc' seek +10",
+      "text": "Fast Forward 10s",
+      "keyboard": "",
+    },
+    {
+      "click": "'$mpc' seek -10",
+      "text": "Rewind 10s",
+      "keyboard": "",
+    },'
+fi
 
 echo '
   {
-    "image": "'$(pwd)'/'$status'.png",
-    "altimage": "'$(pwd)'/'$status'_neg.png",
+    "image": "'$(dirname "$0")'/'$status'.png",
+    "altimage": "'$(dirname "$0")'/'$status'_neg.png",
     "menus": [
       {
         "click": "",
@@ -91,56 +159,8 @@ echo '
         "keyboard": "",
         "submenus": ['$playlist_menu_items'],
       },
-      {
-        "click": "",
-        "text": "-",
-        "keyboard": "",
-      },
-      {
-        "click": "'$mpc' toggle",
-        "text": "Toggle",
-        "keyboard": "t",
-      },
-      {
-        "click": "'$mpc' stop",
-        "text": "Stop",
-        "keyboard": "s",
-      },
-      {
-        "click": "'$mpc' next",
-        "text": "Next Track",
-        "keyboard": "n",
-      },
-      {
-        "click": "'$mpc' prev",
-        "text": "Previous Track",
-        "keyboard": "p",
-      },
-      {
-        "click": "",
-        "text": "-",
-        "keyboard": "",
-      },
-      {
-        "click": "'$mpc' seek +5",
-        "text": "Fast Forward 5s",
-        "keyboard": "f",
-      },
-      {
-        "click": "'$mpc' seek -5",
-        "text": "Rewind 5s",
-        "keyboard": "r",
-      },
-      {
-        "click": "'$mpc' seek +10",
-        "text": "Fast Forward 10s",
-        "keyboard": "",
-      },
-      {
-        "click": "'$mpc' seek -10",
-        "text": "Rewind 10s",
-        "keyboard": "",
-      },
+      '$control_menus'
+      '$seek_menus'
       {
         "click": "",
         "text": "-",
