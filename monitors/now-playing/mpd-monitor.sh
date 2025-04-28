@@ -148,6 +148,17 @@ else
     },'
 fi
 
+if $(echo "$mpd_status" | grep -Eoq "repeat: on"); then
+  repeat=true
+else
+  repeat=false
+fi
+if $(echo "$mpd_status" | grep -Eoq "single: on"); then
+  single=true
+else
+  single=false
+fi
+
 echo '
   {
     "image": "'$(dirname "$0")'/'$status'.png",
@@ -173,7 +184,7 @@ echo '
       },
       {
         "click": "'$mpc' add /",
-        "text": "Add all tracks",
+        "text": "Add All Tracks",
         "keyboard": "",
       },
       {
@@ -185,6 +196,18 @@ echo '
         "click": "'$mpc' shuffle",
         "text": "Shuffle Playlist",
         "keyboard": "",
+      },
+      {
+        "click": "'$mpc' repeat",
+        "text": "Repeat Mode",
+        "keyboard": "",
+        "checked": "'$repeat'",
+      },
+      {
+        "click": "'$mpc' single",
+        "text": "Single Mode",
+        "keyboard": "",
+        "checked": "'$single'",
       },
     ],
     "text": "'$menu_text'"
