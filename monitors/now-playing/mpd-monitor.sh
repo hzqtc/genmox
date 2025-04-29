@@ -13,6 +13,7 @@ if test ! -x "$mpc"; then
   exit 1
 fi
 
+# -f "%file%" asks MPC to return file name of the current track
 mpd_status=$($mpc status -f "%file%" 2>&1)
 if $(echo "$mpd_status" | grep -iq "error:"); then
   status="error"
@@ -40,7 +41,8 @@ fi
 if [[ "$mpd_status" =~ \[(playing|paused)\] ]]; then
   status=$(echo "$mpd_status" | grep -Eo "(playing|paused)")
   title=$(echo "$mpd_status" | head -n 1 )
-  title=${title%.*}
+  title=${title%.*} # remove file name extension
+  title=${title#*/} # remove directory
   progress=$(echo "$mpd_status" | grep -Eo "[0-9]{1,2}:[0-9]{2}/[0-9]{1,2}:[0-9]{2}")
   menu_text="$title $progress"
 
@@ -161,8 +163,8 @@ fi
 
 echo '
   {
-    "image": "'$(dirname "$0")'/'$status'.png",
-    "altimage": "'$(dirname "$0")'/'$status'_neg.png",
+    "image": "",
+    "altimage": "",
     "menus": [
       {
         "click": "",
