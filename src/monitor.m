@@ -67,6 +67,7 @@
     NSData *commandOutput;
 
     if (command) {
+        NSLog(@"Execute command: %@", [command description]);
         commandOutput = [command execute];
     }
     else {
@@ -92,6 +93,8 @@
                                                                  error: &e];
     if (jsonObject == nil) {
         NSLog(@"JSON parse error: %@", e);
+        NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+        NSLog(@"JSON output: %@", jsonString);
         return -1;
     }
 

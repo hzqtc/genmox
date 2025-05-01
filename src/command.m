@@ -5,6 +5,7 @@
 @synthesize name, args;
 
 -(id) initWithLaunchString: (NSString *) commandString {
+    NSLog(@"Init command: %@", commandString);
     if ([self init]) {
         NSArray *components = [commandString componentsSeparatedByString: @" "];
         self.name = [components objectAtIndex: 0];
