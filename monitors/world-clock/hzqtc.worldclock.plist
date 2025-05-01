@@ -8,15 +8,15 @@
   <key>ProgramArguments</key>
   <array>
     <string>/Users/hzqtc/Code/genmox/src/genmox</string>
-  	<string>30</string>
-  	<string>/Users/hzqtc/Code/genmox/monitors/world-clock/world-clock.sh Asia/Shanghai America/New_York Europe/Zurich</string>
+    <string>30</string>
+    <string>/Users/hzqtc/Code/genmox/monitors/world-clock/world-clock.sh</string>
   </array>
 
   <key>RunAtLoad</key>
   <true/>
   <key>KeepAlive</key>
   <true/>
-  
+
   <key>StandardOutPath</key>
   <string>/tmp/hzqtc-worldclock.log</string>
   <key>StandardErrorPath</key>

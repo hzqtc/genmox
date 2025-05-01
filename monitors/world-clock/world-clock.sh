@@ -1,5 +1,7 @@
 #!/bin/bash
 
+time_zones=("Asia/Shanghai" "America/New_York" "Europe/Zurich")
+
 get_time_in_zone() {
   local timezone=$1
   # Set the timezone and get the current time in format "Apr 14 3:14PM"
@@ -9,15 +11,9 @@ get_time_in_zone() {
   echo "$city: $current_time"
 }
 
-# Check if at least one timezone is provided
-if [ $# -eq 0 ]; then
-    echo "Usage: $0 <timezone1> <timezone2> ... <timezoneN>"
-    exit 1
-fi
-
 # Format timezone times into menu items in JSON
 menu_items=""
-for timezone in "$@"; do
+for timezone in "${time_zones[@]}"; do
   formatted_time=$(get_time_in_zone "$timezone")
   menu_items+='
     {
