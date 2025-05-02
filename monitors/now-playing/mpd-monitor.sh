@@ -211,6 +211,16 @@ echo '
         "keyboard": "",
         "checked": "'$single'",
       },
+      {
+        "click": "",
+        "text": "-",
+        "keyboard": "",
+      },
+      {
+        "click": "/opt/homebrew/bin/brew services restart mpd",
+        "text": "Restart MPD",
+        "keyboard": "d",
+      },
     ],
     "text": "'$menu_text'"
   }'
