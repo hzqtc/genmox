@@ -195,6 +195,11 @@ echo '
         "keyboard": "",
       },
       {
+        "click": "",
+        "text": "-",
+        "keyboard": "",
+      },
+      {
         "click": "'$mpc' shuffle",
         "text": "Shuffle Playlist",
         "keyboard": "",
