@@ -8,8 +8,7 @@ if test ! -x "$mpc"; then
     "altimage": "",
     "menus": [],
     "text": "Error mpc not found"
-  }
-  '
+  }'
   exit 1
 fi
 
@@ -32,8 +31,7 @@ if [[ "$status" == "error" ]]; then
       },
     ],
     "text": "MPD error"
-  }
-  '
+  }'
   exit 0
 fi
 
@@ -76,8 +74,7 @@ for track in $($mpc playlist -f "%file% (%position%)"); do
     "text": "'${track%.*}'",
     "keyboard": "",
     "checked": "'$checked'",
-  },
-  '
+  },'
 
   playlist_len=$((playlist_len + 1))
 done
@@ -150,6 +147,23 @@ else
     },'
 fi
 
+# Menu items to add top-level directories to current playlist
+add_to_playlist_menu_items='
+  {
+    "click": "'$mpc' add /",
+    "text": "Add /",
+    "keyboard": "",
+  },'
+IFS=$'\n'
+for dir in $($mpc lsdir); do
+  add_to_playlist_menu_items+='
+  {
+    "click": "'$mpc' add '$dir'",
+    "text": "Add '$dir'",
+    "keyboard": "",
+  },'
+done
+
 if $(echo "$mpd_status" | grep -Eoq "repeat: on"); then
   repeat=true
 else
@@ -185,9 +199,10 @@ echo '
         "keyboard": "",
       },
       {
-        "click": "'$mpc' add /",
-        "text": "Add All Tracks",
+        "click": "",
+        "text": "Add Tracks",
         "keyboard": "",
+        "submenus": ['$add_to_playlist_menu_items']
       },
       {
         "click": "'$mpc' clear",
