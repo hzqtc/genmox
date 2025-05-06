@@ -29,6 +29,6 @@ echo '
     "image": "",
     "altimage": "",
     "menus": ['$menu_items'],
-    "text": "'$(get_time_in_zone $1)'"
+    "text": "'$(get_time_in_zone ${time_zones[0]})'"
   }
 '

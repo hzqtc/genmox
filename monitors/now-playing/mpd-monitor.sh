@@ -147,7 +147,7 @@ else
     },'
 fi
 
-# Menu items to add top-level directories to current playlist
+# Menu items to add root and top-level directories to current playlist
 add_to_playlist_menu_items='
   {
     "click": "'$mpc' add /",

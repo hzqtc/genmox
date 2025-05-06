@@ -42,7 +42,7 @@
                                                   action: @selector(terminate:)
                                            keyEquivalent: @"q"];
 
-        menuCommandMap = [NSMutableDictionary dictionaryWithCapacity: 10];
+        menuCommandMap = [NSMutableDictionary dictionaryWithCapacity: 100];
     }
     return self;
 }
