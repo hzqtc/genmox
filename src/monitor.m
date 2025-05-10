@@ -98,7 +98,18 @@
         return -1;
     }
 
-    statusBarButton.title = [jsonObject objectForKey: @"text"];
+    NSString *title = [jsonObject objectForKey: @"text"];
+    NSString *textColor = [jsonObject objectForKey: @"textcolor"];
+    if (textColor != nil) {
+      NSDictionary *attributes = @{
+        NSForegroundColorAttributeName: [self colorFromHexString: textColor],
+                   NSFontAttributeName: [NSFont systemFontOfSize:[NSFont systemFontSize]]
+      };
+      NSAttributedString *attributedTitle = [[NSAttributedString alloc] initWithString:title attributes:attributes];
+      statusBarButton.attributedTitle = attributedTitle;
+    } else {
+      statusBarButton.title = title;
+    }
     NSImage *image = [[NSImage alloc] initWithContentsOfFile: [jsonObject objectForKey: @"image"]];
     image.template = YES;
     NSImage *altImage = [[NSImage alloc] initWithContentsOfFile: [jsonObject objectForKey: @"altimage"]];
@@ -111,7 +122,7 @@
     [menuCommandMap removeAllObjects];
 
     NSArray *menuObjs = [jsonObject objectForKey: @"menus"];
-    NSArray<NSMenuItem *> *menuItems = [self getMenuItems:menuObjs];
+    NSArray<NSMenuItem *> *menuItems = [self getMenuItems: menuObjs];
     for (NSMenuItem *item in menuItems) {
       [statusMenu addItem: item];
     }
@@ -129,6 +140,7 @@
     NSMutableArray<NSMenuItem *> *menuItems = [NSMutableArray array];
     for (NSDictionary *menuObj in menuObjs) {
         NSString *menuItemTitle = [menuObj objectForKey: @"text"];
+        NSString *menuItemTitleColor = [menuObj objectForKey: @"textcolor"];
         NSString *menuItemCommand = [menuObj objectForKey: @"click"];
         NSString *menuItemKeyboard = [menuObj objectForKey: @"keyboard"];
         NSString *menuItemChecked = [menuObj objectForKey: @"checked"];
@@ -141,7 +153,15 @@
         else if ([menuItemTitle length] > 0) {
             menuItem = [[NSMenuItem alloc] initWithTitle: menuItemTitle
                                                   action: nil
-                                           keyEquivalent: menuItemKeyboard];
+                                           keyEquivalent: menuItemKeyboard ?: @""];
+            if (menuItemTitleColor != nil) {
+              NSDictionary *attributes = @{
+                NSForegroundColorAttributeName: [self colorFromHexString: menuItemTitleColor],
+                           NSFontAttributeName: [NSFont systemFontOfSize:[NSFont systemFontSize]]
+              };
+              NSAttributedString *attributedTitle = [[NSAttributedString alloc] initWithString:menuItemTitle attributes:attributes];
+              menuItem.attributedTitle = attributedTitle;
+            }
             if ([menuItemCommand length] > 0) {
                 menuItem.target = self;
                 menuItem.action = @selector(menuAction:);
@@ -175,6 +195,35 @@
     Command *menuCommand = [[Command alloc] initWithLaunchString: [menuCommandMap objectForKey: key]];
     [menuCommand execute];
 }
+
+- (NSColor *) colorFromHexString: (NSString *) hexString {
+  // Trim space and remove # if it exists
+  NSString *colorString = [hexString stringByTrimmingCharactersInSet:
+    [NSCharacterSet whitespaceAndNewlineCharacterSet]];
+  if ([colorString hasPrefix:@"#"]) {
+        colorString = [colorString substringFromIndex:1];
+  }
+
+  if ([colorString length] != 6) {
+    NSLog(@"Invalid text color: %@", colorString);
+    return [NSColor labelColor]; // Invalid format
+  }
+
+  unsigned int r, g, b;
+  NSScanner *scanner;
+  scanner = [NSScanner scannerWithString:[colorString substringWithRange:NSMakeRange(0, 2)]];
+  [scanner scanHexInt:&r];
+  scanner = [NSScanner scannerWithString:[colorString substringWithRange:NSMakeRange(2, 2)]];
+  [scanner scanHexInt:&g];
+  scanner = [NSScanner scannerWithString:[colorString substringWithRange:NSMakeRange(4, 2)]];
+  [scanner scanHexInt:&b];
+
+  return [NSColor colorWithCalibratedRed:(r / 255.0)
+                                   green:(g / 255.0)
+                                    blue:(b / 255.0)
+                                   alpha:1.0];
+}
+
 
 @end
 
