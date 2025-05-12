@@ -67,8 +67,9 @@ quote_menu_item() {
   local symbol=$(echo "$json" | jq -r '.symbol')
   local price=$(echo "$json" | jq -r '.price')
   local change=$(echo "$json" | jq -r '.change')
-  local quote=$(printf "%s \$%.2f %+.2f\n" "$symbol" "$price" "$change")
   local change_percent=$(echo "$json" | jq -r '.change_percent')
+
+  local quote=$(printf "%s \$%.2f %+.2f%% \n" "$symbol" "$price" "$change_percent")
   local color=$(quote_color "$change_percent")
   local click="/usr/bin/open https://www.google.com/search?q=${symbol}+stock"
 
