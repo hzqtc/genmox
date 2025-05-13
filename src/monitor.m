@@ -106,24 +106,33 @@
   if (textColor != nil) {
     NSDictionary *attributes = @{
       NSForegroundColorAttributeName: [self colorFromHexString: textColor],
-                 NSFontAttributeName: [NSFont systemFontOfSize:[NSFont systemFontSize]]
+                 NSFontAttributeName: [NSFont systemFontOfSize: [NSFont systemFontSize]]
     };
-    NSAttributedString *attributedTitle = [[NSAttributedString alloc] initWithString:title attributes:attributes];
+    NSAttributedString *attributedTitle = [[NSAttributedString alloc] initWithString: title
+                                                                          attributes: attributes];
     statusBarButton.attributedTitle = attributedTitle;
   } else {
     statusBarButton.title = title;
   }
-  NSImage *image = [[NSImage alloc] initWithContentsOfFile: [jsonObject objectForKey: @"image"]];
-  image.template = YES;
-  NSImage *altImage = [[NSImage alloc] initWithContentsOfFile: [jsonObject objectForKey: @"altimage"]];
-  altImage.template = YES;
-  statusBarButton.image = image;
-  statusBarButton.alternateImage = altImage;
+
+  NSString *imageSymbol = [jsonObject objectForKey: @"imagesymbol"];
+  NSString *imagePath = [jsonObject objectForKey: @"image"];
+  NSImage *image;
+  if (imageSymbol != nil) {
+    image = [NSImage imageWithSystemSymbolName: imageSymbol
+                      accessibilityDescription: @""];
+  } else if (imagePath != nil) {
+    image = [[NSImage alloc] initWithContentsOfFile: imagePath];
+  }
+  if (image != nil) {
+    image.template = YES;
+    statusBarButton.image = image;
+  }
+
   statusBarButton.toolTip = [jsonObject objectForKey: @"tooltip"];
 
   [statusMenu removeAllItems];
   [menuCommandMap removeAllObjects];
-
   NSArray *menuObjs = [jsonObject objectForKey: @"menus"];
   NSArray<NSMenuItem *> *menuItems = [self getMenuItems: menuObjs];
   for (NSMenuItem *item in menuItems) {

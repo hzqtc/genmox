@@ -24,10 +24,16 @@ for timezone in "${time_zones[@]}"; do
   '
 done
 
+first_time_zone=${time_zones[0]}
+hour=$(TZ="$first_time_zone" date +"%H")
+if [ "$hour" -ge 6 ] && [ "$hour" -lt 20 ]; then
+  image_symbol="sun.max"
+elif [ "$hour" -ge 20 ] || [ "$hour" -lt 6 ]; then
+  image_symbol="moon"
+fi
 echo '
   {
-    "image": "",
-    "altimage": "",
+    "imagesymbol": "'$image_symbol'",
     "menus": ['$menu_items'],
     "text": "'$(get_time_in_zone ${time_zones[0]})'"
   }

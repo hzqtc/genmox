@@ -100,10 +100,8 @@ menu_items=$(printf "%s\n" "${menu_item_json[@]}" | jq -s '.')
 text=$(echo "${menu_item_json[0]}" | jq -r '.text')
 color=$(echo "${menu_item_json[0]}" | jq -r '.textcolor')
 jq -n \
-  --arg image "" \
-  --arg altimage "" \
   --argjson menus "$menu_items" \
   --arg text "$text" \
   --arg textcolor "$color" \
-  '{"image": $image, "altimage": $altimage, "menus": $menus, "text": $text, textcolor: $textcolor}'
+  '{"menus": $menus, "text": $text, textcolor: $textcolor}'
 

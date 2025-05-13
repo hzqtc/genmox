@@ -33,8 +33,6 @@ tx_rate=$(( (tx_bytes2 - tx_bytes) / 1024 )) # in KB
 summary="CPU: ${cpu_usage}%; Mem: ${used_mem_gb}/${total_mem_gb}G; Net: ${rx_rate}k↓/${tx_rate}k↑"
 echo '
 {
-  "image": "",
-  "altimage": "",
   "menus": [],
   "text": "'$summary'"
 }'

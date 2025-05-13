@@ -175,10 +175,17 @@ else
   single=false
 fi
 
+if [[ "$status" == "playing" ]]; then
+  image_symbol="play.fill"
+elif [[ "$status" == "paused" ]]; then
+  image_symbol="pause.fill"
+elif [[ "$status" == "stopped" ]]; then
+  image_symbol="stop.fill"
+fi
+
 echo '
   {
-    "image": "",
-    "altimage": "",
+    "imagesymbol": "'$image_symbol'",
     "menus": [
       {
         "click": "",
