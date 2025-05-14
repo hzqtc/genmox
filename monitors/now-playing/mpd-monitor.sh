@@ -4,9 +4,7 @@ mpc="/opt/homebrew/bin/mpc"
 if test ! -x "$mpc"; then
   echo '
   {
-    "image": "",
-    "altimage": "",
-    "menus": [],
+    "imagesymbol": "exclamationmark.triangle",
     "text": "Error mpc not found"
   }'
   exit 1
@@ -21,8 +19,7 @@ fi
 if [[ "$status" == "error" ]]; then
   echo '
   {
-    "image": "",
-    "altimage": "",
+    "imagesymbol": "exclamationmark.triangle",
     "menus": [
       {
         "click": "/opt/homebrew/bin/brew services restart mpd",
