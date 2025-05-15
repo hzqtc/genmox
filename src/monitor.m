@@ -34,9 +34,9 @@
 
     statusMenu = [NSMenu new];
     [statusItem setMenu: statusMenu];
-    updateMenuItem = [[NSMenuItem alloc] initWithTitle: @"Refresh"
+    updateMenuItem = [[NSMenuItem alloc] initWithTitle: @"Update Now"
                                                 action: @selector(updateMenuAction:)
-                                         keyEquivalent: @"r"];
+                                         keyEquivalent: @""];
     [updateMenuItem setTarget: self];
     quitMenuItem = [[NSMenuItem alloc] initWithTitle: @"Quit"
                                               action: @selector(terminate:)
@@ -207,8 +207,6 @@
   NSNumber *key = [NSNumber numberWithUnsignedInt: [sender hash]];
   Command *menuCommand = [[Command alloc] initWithLaunchString: [menuCommandMap objectForKey: key]];
   [menuCommand execute];
-  // Update the monitor after running a command
-  [self monitorRoutine];
 }
 
 - (NSColor *) colorFromHexString: (NSString *) hexString {
