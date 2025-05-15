@@ -18,22 +18,22 @@ if [[ -z "$pkgs" ]]; then
   {
     "imagesymbol": "circle",
     "text": "",
+    "menus": [{"text": "Up to date"}]
   }'
 else
   menuitems='
   {
     "click": "'$brew' upgrade",
     "text": "Upgrade all",
-    "keyboard": "a"
+    "keyboard": "a",
+    "refresh": true
   }, {
     "text": "-"
   },'
   while IFS= read -r pkg; do
-    pkg_name=${pkg%% *}
     text=$(echo "$pkg" | sed -E 's/^(.*) \((.*)\) < (.*)$/\1: \2 => \3/')
     menuitems+='
     {
-      "click": "'$brew' upgrade '$pkg_name'",
       "text": "'$text'"
     },'
   done <<< "$pkgs"
