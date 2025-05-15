@@ -8,7 +8,10 @@
   NSMenu *statusMenu;
   NSMenuItem *updateMenuItem;
   NSMenuItem *quitMenuItem;
+  // A map from menu item hash to command
   NSMutableDictionary *menuCommandMap;
+  // A set of menu items that would trigger a refresh after executing
+  NSMutableSet *refreshingMenuItems;
 }
 
 @synthesize command;
@@ -34,15 +37,16 @@
 
     statusMenu = [NSMenu new];
     [statusItem setMenu: statusMenu];
-    updateMenuItem = [[NSMenuItem alloc] initWithTitle: @"Update Now"
+    updateMenuItem = [[NSMenuItem alloc] initWithTitle: @"Refresh"
                                                 action: @selector(updateMenuAction:)
-                                         keyEquivalent: @""];
+                                         keyEquivalent: @"r"];
     [updateMenuItem setTarget: self];
     quitMenuItem = [[NSMenuItem alloc] initWithTitle: @"Quit"
                                               action: @selector(terminate:)
                                        keyEquivalent: @"q"];
 
     menuCommandMap = [NSMutableDictionary dictionaryWithCapacity: 100];
+    refreshingMenuItems = [NSMutableSet setWithCapacity: 100];
   }
   return self;
 }
@@ -133,6 +137,7 @@
 
   [statusMenu removeAllItems];
   [menuCommandMap removeAllObjects];
+  [refreshingMenuItems removeAllObjects];
   NSArray *menuObjs = [jsonObject objectForKey: @"menus"];
   NSArray<NSMenuItem *> *menuItems = [self getMenuItems: menuObjs];
   for (NSMenuItem *item in menuItems) {
@@ -156,6 +161,7 @@
     NSString *menuItemCommand = [menuObj objectForKey: @"click"];
     NSString *menuItemKeyboard = [menuObj objectForKey: @"keyboard"];
     NSString *menuItemChecked = [menuObj objectForKey: @"checked"];
+    BOOL menuItemRefresh = [[menuObj objectForKey: @"refresh"] boolValue];
     NSArray *submenuObjs = [menuObj objectForKey: @"submenus"];
 
     NSMenuItem *menuItem;
@@ -180,6 +186,9 @@
         menuItem.action = @selector(menuAction:);
         NSNumber *key = [NSNumber numberWithUnsignedInt: [menuItem hash]];
         [menuCommandMap setObject: menuItemCommand forKey: key];
+        if (menuItemRefresh) {
+          [refreshingMenuItems addObject: key];
+        }
       }
 
       if (menuItemChecked && [menuItemChecked caseInsensitiveCompare:@"true"] == NSOrderedSame) {
@@ -207,6 +216,10 @@
   NSNumber *key = [NSNumber numberWithUnsignedInt: [sender hash]];
   Command *menuCommand = [[Command alloc] initWithLaunchString: [menuCommandMap objectForKey: key]];
   [menuCommand execute];
+  if ([refreshingMenuItems containsObject: key]) {
+    NSLog(@"Refreshing after executing command");
+    [self monitorRoutine];
+  }
 }
 
 - (NSColor *) colorFromHexString: (NSString *) hexString {
