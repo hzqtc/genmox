@@ -7,6 +7,7 @@
 
 -(id) initWithLaunchString: (NSString *) commandString;
 -(NSData *) execute;
+-(void) execute: (void (^)(NSData *output))completion;
 -(NSString *) description;
 
 @end

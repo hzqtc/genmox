@@ -15,11 +15,11 @@ release: CFLAGS += -O2
 release: $(TARGET)
 
 $(TARGET): $(OBJ)
-	$(CC) $(LDFLAGS) $^ -o $(TARGET)
+	$(CC) $(LDFLAGS) $^ -o $@
 
 %.o: %.m
-	$(CC) $(CFLAGS) -c $^
+	$(CC) $(CFLAGS) -c $< -o $@
 
-.PHONY:
+.PHONY: clean
 clean:
-	-rm -f *.o
+	-rm -f *.o $(TARGET)

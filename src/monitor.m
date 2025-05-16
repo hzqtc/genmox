@@ -215,11 +215,12 @@
 -(void) menuAction: (id) sender {
   NSNumber *key = [NSNumber numberWithUnsignedInt: [sender hash]];
   Command *menuCommand = [[Command alloc] initWithLaunchString: [menuCommandMap objectForKey: key]];
-  [menuCommand execute];
-  if ([refreshingMenuItems containsObject: key]) {
-    NSLog(@"Refreshing after executing command");
-    [self monitorRoutine];
-  }
+  [menuCommand execute: ^(NSData *outputData) {
+    if ([refreshingMenuItems containsObject: key]) {
+      NSLog(@"Refreshing after executing command");
+      [self monitorRoutine];
+    }
+  }];
 }
 
 - (NSColor *) colorFromHexString: (NSString *) hexString {
