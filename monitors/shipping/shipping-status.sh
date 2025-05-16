@@ -29,7 +29,14 @@ fi
 menu_items=$(echo "$response" | jq -r '
     [.parcels[] | {
       text: "\(.description): \(.tracking_status_readable)",
-      click: "/usr/bin/open https://www.google.com/search?q=\(.carrier)+\(.tracking_id)"
+      click: "/usr/bin/open \(
+        if .carrier == "USPS" then "https://tools.usps.com/go/TrackConfirmAction?tLabels=\(.tracking_id)"
+        elif .carrier == "UPS" then "https://www.ups.com/track?loc=en_US&tracknum=\(.tracking_id)"
+        elif .carrier == "FedEx" then "https://www.fedex.com/apps/fedextrack/?tracknumbers=\(.tracking_id)"
+        elif .carrier == "DHL" then "https://www.dhl.com/global-en/home/tracking.html?tracking-id=\(.tracking_id)"
+        else "https://www.google.com/search?q=\(.carrier)+\(.tracking_id)"
+        end
+      )"
     }] | tojson')
 echo '
 {
