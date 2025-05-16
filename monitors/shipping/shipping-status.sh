@@ -1,6 +1,6 @@
 #!/bin/bash
 
-TOKEN_FILE=".api_token"
+TOKEN_FILE="$(dirname "$0")/.api_token"
 API_URL="https://onetracker.app/api/parcels?archived=false"
 
 if [ ! -f "$TOKEN_FILE" ]; then
