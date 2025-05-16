@@ -44,7 +44,7 @@ quote_color() {
 
   # Determine shade based on threshold
   local primary_shade
-  local second_shade
+  local secondary_shade
   if (( $(echo "$abs_percent < 4" | bc -l) )); then
     primary_shade="A7"
     secondary_shade="00"

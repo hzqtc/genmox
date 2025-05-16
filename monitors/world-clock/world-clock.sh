@@ -7,7 +7,7 @@ get_time_in_zone() {
   # Set the timezone and get the current time in format "Apr 14 3:14PM"
   current_time=$(TZ="$timezone" date +"%b %d %I:%M%p")
   # Convert timezone to city name
-  city=`echo ${timezone#*/} | tr _ ' '`
+  city=$(echo ${timezone#*/} | tr _ ' ')
   echo "$city: $current_time"
 }
 

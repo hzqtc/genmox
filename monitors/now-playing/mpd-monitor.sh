@@ -12,7 +12,7 @@ fi
 
 # -f "%file%" asks MPC to return file name of the current track
 mpd_status=$($mpc status -f "%file%" 2>&1)
-if $(echo "$mpd_status" | grep -iq "error:"); then
+if echo "$mpd_status" | grep -iq "error:"; then
   status="error"
 fi
 
@@ -52,14 +52,14 @@ else
 fi
 
 # Get the playlist
-plaplaylist_menu_items=""
+playlist_menu_items=""
 playlist_len=0
 IFS=$'\n'
 for track in $($mpc playlist -f "%file% (%position%)"); do
   track_pos=$(echo $track | grep -Eo "\([0-9]+\)")
   track_pos=${track_pos#(}
   track_pos=${track_pos%)}
-  if [[ $current_pos == $track_pos ]]; then
+  if [[ "$current_pos" == "$track_pos" ]]; then
     checked=true
   else
     checked=false
@@ -161,12 +161,12 @@ for dir in $($mpc lsdir); do
   },'
 done
 
-if $(echo "$mpd_status" | grep -Eoq "repeat: on"); then
+if echo "$mpd_status" | grep -Eoq "repeat: on"; then
   repeat=true
 else
   repeat=false
 fi
-if $(echo "$mpd_status" | grep -Eoq "single: on"); then
+if echo "$mpd_status" | grep -Eoq "single: on"; then
   single=true
 else
   single=false
