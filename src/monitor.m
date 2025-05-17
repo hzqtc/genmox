@@ -158,6 +158,8 @@
   for (NSDictionary *menuObj in menuObjs) {
     NSString *menuItemTitle = [menuObj objectForKey: @"text"];
     NSString *menuItemTitleColor = [menuObj objectForKey: @"textcolor"];
+    NSString *menuItemSubtitle = [menuObj objectForKey: @"subtext"];
+    NSString *menuItemBadge = [menuObj objectForKey: @"badge"];
     NSString *menuItemCommand = [menuObj objectForKey: @"click"];
     NSString *menuItemKeyboard = [menuObj objectForKey: @"keyboard"];
     NSString *menuItemChecked = [menuObj objectForKey: @"checked"];
@@ -167,8 +169,7 @@
     NSMenuItem *menuItem;
     if ([menuItemTitle isEqualToString: @"-"]) {
       menuItem = [NSMenuItem separatorItem];
-    }
-    else if (menuItemTitle && [menuItemTitle length] > 0) {
+    } else if (menuItemTitle && [menuItemTitle length] > 0) {
       menuItem = [[NSMenuItem alloc] initWithTitle: menuItemTitle
                                             action: nil
                                      keyEquivalent: menuItemKeyboard ?: @""];
@@ -180,6 +181,12 @@
         NSAttributedString *attributedTitle = [[NSAttributedString alloc] initWithString:menuItemTitle
                                                                               attributes:attributes];
         menuItem.attributedTitle = attributedTitle;
+      }
+      if (menuItemSubtitle != nil) {
+        menuItem.subtitle = menuItemSubtitle;
+      }
+      if (menuItemBadge != nil) {
+        menuItem.badge = [[NSMenuItemBadge alloc] initWithString: menuItemBadge];
       }
       if (menuItemCommand && [menuItemCommand length] > 0) {
         menuItem.target = self;
