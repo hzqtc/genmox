@@ -27,8 +27,15 @@ if [[ "$rpc_status" != "ok" ]]; then
 fi
 
 menu_items=$(echo "$response" | jq -r '
+    def to_camel_case:
+      split("_") 
+          | map( if length > 0 then (.[:1] | ascii_upcase) + .[1:] else "" end ) 
+          | join(" ");
+
     [.parcels[] | {
-      text: "\(.description): \(.tracking_status_readable)",
+      text: "\(.description): \(.tracking_status | to_camel_case)",
+      subtext: "\(.tracking_location)",
+      badge: "\(.carrier)",
       click: "/usr/bin/open \(
         if .carrier == "USPS" then "https://tools.usps.com/go/TrackConfirmAction?tLabels=\(.tracking_id)"
         elif .carrier == "UPS" then "https://www.ups.com/track?loc=en_US&tracknum=\(.tracking_id)"
@@ -38,9 +45,19 @@ menu_items=$(echo "$response" | jq -r '
         end
       )"
     }] | tojson')
+
+has_delivered_or_out=$(echo "$response" |
+  jq '[.parcels[] | select(.tracking_status == "out_for_delivery" or .tracking_status == "delivered")] | length')
+
+if [ "$has_delivered_or_out" -gt 0 ]; then
+  symbol="shippingbox.fill"
+else
+  symbol="shippingbox"
+fi
+
 echo '
 {
-  "imagesymbol": "shippingbox.fill",
+  "imagesymbol": "'$symbol'",
   "text": "",
   "menus": '$menu_items'
 }'
