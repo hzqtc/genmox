@@ -1,6 +1,8 @@
 #!/bin/bash
 
 brew="/opt/homebrew/bin/brew"
+notifier="/opt/homebrew/bin/terminal-notifier"
+
 if test ! -x "$brew"; then
   echo '
   {
@@ -43,5 +45,14 @@ else
     "text": "",
     "menus": ['$menuitems']
   }'
+
+  if test -x "$notifier"; then
+    $notifier \
+      -group "homebrew-outdated-pkgs" \
+      -title "Newer formula available" \
+      -message "$pkgs" \
+      -sound Glass \
+      -sender com.apple.Terminal > /dev/null 2>&1
+  fi
 fi
 
