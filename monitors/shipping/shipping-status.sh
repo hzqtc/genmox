@@ -1,7 +1,8 @@
 #!/bin/bash
 
-TOKEN_FILE="$(dirname "$0")/.api_token"
+TOKEN_FILE="$(dirname $0)/.api_token"
 API_URL="https://onetracker.app/api/parcels?archived=false"
+ARCHIVE_SH="$(dirname $0)/archive.sh"
 
 if [ ! -f "$TOKEN_FILE" ]; then
   echo '{"text": "Token not found", "imagesymbol": "exclamationmark.triangle"}'
@@ -46,14 +47,18 @@ menu_items=$(echo "$response" | jq -r '
       )"
     }] | tojson')
 
-has_delivered_pkg=$(echo "$response" | jq -r '[.parcels[] | select(.tracking_status == "delivered") | .id] | length')
-if [ "$has_delivered_pkg" -gt 0 ]; then
+top_menu_items='{"text": "Open OneTracker", "click": "/usr/bin/open https://onetracker.app/parcels"}'
+
+delivered_pkg_ids=$(echo "$response" | jq -r '[.parcels[] | select(.tracking_status == "delivered") | .id] | join(" ")')
+if [[ -n "$delivered_pkg_ids" ]]; then
   symbol="shippingbox.fill"
+  archive_cmd="$ARCHIVE_SH $delivered_pkg_ids"
+  top_menu_items+=', {"text": "Archive delivered", "click": "'$archive_cmd'", "refresh": true}'
 else
   symbol="shippingbox"
 fi
 
-top_menu_items='{"text": "Open OneTracker", "click": "/usr/bin/open https://onetracker.app/parcels"}, {"text":"-"}'
+top_menu_items+=', {"text": "-"}'
 if [[ "$menu_items" == "[]" ]]; then
   top_menu_items+=', {"text": "No pakcages"}'
 fi

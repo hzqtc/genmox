@@ -14,6 +14,8 @@ rpc_status=$(echo "$response" | jq -r '.message')
 if [[ "$rpc_status" != "ok" ]]; then
   echo "Failed to get API token: $response"
   exit 1
+else
+  echo "Login successfully. Writing token to $TOKEN_FILE ..."
 fi
 
 token=$(echo "$response" | jq -r '.session.token')
