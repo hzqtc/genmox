@@ -28,8 +28,8 @@ fi
 
 menu_items=$(echo "$response" | jq -r '
     def to_camel_case:
-      split("_") 
-          | map( if length > 0 then (.[:1] | ascii_upcase) + .[1:] else "" end ) 
+      split("_")
+          | map( if length > 0 then (.[:1] | ascii_upcase) + .[1:] else "" end )
           | join(" ");
 
     [.parcels[] | {
@@ -46,14 +46,18 @@ menu_items=$(echo "$response" | jq -r '
       )"
     }] | tojson')
 
-has_delivered_or_out=$(echo "$response" |
-  jq '[.parcels[] | select(.tracking_status == "out_for_delivery" or .tracking_status == "delivered")] | length')
-
-if [ "$has_delivered_or_out" -gt 0 ]; then
+has_delivered_pkg=$(echo "$response" | jq -r '[.parcels[] | select(.tracking_status == "delivered") | .id] | length')
+if [ "$has_delivered_pkg" -gt 0 ]; then
   symbol="shippingbox.fill"
 else
   symbol="shippingbox"
 fi
+
+top_menu_items='{"text": "Open OneTracker", "click": "/usr/bin/open https://onetracker.app/parcels"}, {"text":"-"}'
+if [[ "$menu_items" == "[]" ]]; then
+  top_menu_items+=', {"text": "No pakcages"}'
+fi
+menu_items=$(jq -s 'add' <(echo "[$top_menu_items]") <(echo "$menu_items"))
 
 echo '
 {
