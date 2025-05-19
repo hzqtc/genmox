@@ -238,9 +238,11 @@
     colorString = [colorString substringFromIndex:1];
   }
 
-  if ([colorString length] != 6) {
+  if ([colorString length] == 0) {
+    return [NSColor labelColor];
+  } else if ([colorString length] != 6) {
     NSLog(@"Invalid text color: %@", colorString);
-    return [NSColor labelColor]; // Invalid format
+    return [NSColor labelColor];
   }
 
   unsigned int r, g, b;
