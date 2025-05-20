@@ -69,15 +69,17 @@ quote_menu_item() {
   local change=$(echo "$json" | jq -r '.change')
   local change_percent=$(echo "$json" | jq -r '.change_percent')
 
-  local quote=$(printf "%s \$%.2f %+.2f%% \n" "$symbol" "$price" "$change_percent")
+  local quote=$(printf "%s \$%.2f\n" "$symbol" "$price")
+  local badge=$(printf "%+.2f%%\n" "$change_percent")
   local color=$(quote_color "$change_percent")
   local click="/usr/bin/open https://www.google.com/search?q=${symbol}+stock"
 
   echo $(jq -n \
     --arg click "$click" \
     --arg text "$quote" \
+    --arg badge "$badge" \
     --arg textcolor "$color" \
-    '{click: $click, text: $text, textcolor: $textcolor}')
+    '{click: $click, text: $text, badge: $badge, textcolor: $textcolor}')
 }
 
 # Export for parallel to use

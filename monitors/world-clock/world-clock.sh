@@ -4,22 +4,30 @@ time_zones=("Asia/Shanghai" "America/New_York" "Europe/Zurich")
 
 get_time_in_zone() {
   local timezone=$1
-  # Set the timezone and get the current time in format "Apr 14 3:14PM"
-  current_time=$(TZ="$timezone" date +"%b %d %I:%M%p")
-  # Convert timezone to city name
-  city=$(echo ${timezone#*/} | tr _ ' ')
-  echo "$city: $current_time"
+  TZ="$timezone" date +"%I:%M%p"
+}
+
+get_date_in_zone() {
+  local timezone=$1
+  TZ="$timezone" date +"%b %d"
+}
+
+get_city_name() {
+  local timezone=$1
+  echo ${timezone#*/} | tr _ ' '
 }
 
 # Format timezone times into menu items in JSON
 menu_items=""
 for timezone in "${time_zones[@]}"; do
-  formatted_time=$(get_time_in_zone "$timezone")
+  time=$(get_time_in_zone "$timezone")
+  date=$(get_date_in_zone "$timezone")
+  city=$(get_city_name "$timezone")
   menu_items+='
     {
         "click": "/usr/bin/open -a Clock",
-        "text": "'$formatted_time'",
-        "keyboard": "",
+        "text": "'$city' '$time'",
+        "badge": "'$date'"
     },
   '
 done
@@ -35,6 +43,6 @@ echo '
   {
     "imagesymbol": "'$image_symbol'",
     "menus": ['$menu_items'],
-    "text": "'$(get_time_in_zone ${time_zones[0]})'"
+    "text": "'$(get_city_name $first_time_zone)' '$(get_time_in_zone $first_time_zone)'"
   }
 '

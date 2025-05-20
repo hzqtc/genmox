@@ -27,18 +27,26 @@ else
   {
     "click": "'$brew' upgrade",
     "text": "Upgrade all",
-    "keyboard": "a",
     "refresh": true
   }, {
     "text": "-"
   },'
   while IFS= read -r pkg; do
-    text=$(echo "$pkg" | sed -E 's/^(.*) \((.*)\) < (.*)$/\1: \2 => \3/')
+    # pkg is a string in "name (old_version) < new_version"
+    name=${pkg% (*}
+    new_version=${pkg#*< }
+    brew_info=$($brew info --json $name)
+    desc=$(echo $brew_info | jq -r '.[0] | .desc')
+    url=$(echo $brew_info | jq -r '.[0] | .homepage')
     menuitems+='
     {
-      "text": "'$text'"
+      "text": "'$name'",
+      "subtext": "'$desc'",
+      "badge": "'$new_version'",
+      "click": "/usr/bin/open '$url'"
     },'
   done <<< "$pkgs"
+
   echo '
   {
     "imagesymbol": "circle.fill",
