@@ -1,6 +1,7 @@
 #!/bin/bash
 
 brew="/opt/homebrew/bin/brew"
+brew_upgrade="$(dirname $0)/brew-upgrade.as"
 parallel="/opt/homebrew/bin/parallel"
 notifier="/opt/homebrew/bin/terminal-notifier"
 
@@ -59,7 +60,7 @@ export -f get_pkg_menuitem
 pkg_menuitems=$(echo "$pkgs" | $parallel -k get_pkg_menuitem)
 menuitems='
 {
-  "click": "'$brew' upgrade",
+  "click": "'$brew_upgrade'",
   "text": "Upgrade all",
   "refresh": true
 }, {
