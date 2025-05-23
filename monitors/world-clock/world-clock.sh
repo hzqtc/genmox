@@ -23,13 +23,16 @@ for timezone in "${time_zones[@]}"; do
   time=$(get_time_in_zone "$timezone")
   date=$(get_date_in_zone "$timezone")
   city=$(get_city_name "$timezone")
+
+  if [[ -n "$menu_items" ]]; then
+    menu_items+=","
+  fi
   menu_items+='
     {
         "click": "/usr/bin/open -a Clock",
         "text": "'$city' '$time'",
         "badge": "'$date'"
-    },
-  '
+    }'
 done
 
 first_time_zone=${time_zones[0]}
