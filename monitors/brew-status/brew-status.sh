@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 brew="/opt/homebrew/bin/brew"
 brew_upgrade="$(dirname $0)/brew-upgrade.as"

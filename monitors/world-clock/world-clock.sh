@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 time_zones=("Asia/Shanghai" "America/New_York" "Europe/Zurich")
 

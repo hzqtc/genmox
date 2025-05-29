@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 TOKEN_FILE=".api_token"
 API_URL="https://onetracker.app/api/auth/token"

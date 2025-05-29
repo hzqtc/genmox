@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 mpc="/opt/homebrew/bin/mpc"
 if test ! -x "$mpc"; then

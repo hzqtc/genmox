@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 TOKEN_FILE="$(dirname $0)/.api_token"
 API_URL="https://onetracker.app/api/parcels/%s/archive"

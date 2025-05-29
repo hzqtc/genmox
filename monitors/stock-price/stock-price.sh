@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # This script depends on https://jqlang.org/ and https://www.gnu.org/software/parallel/
 

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 TOKEN_FILE="$(dirname $0)/.api_token"
 SNAPSHOT_FILE="$(dirname $0)/.snapshot"

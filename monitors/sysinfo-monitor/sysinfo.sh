@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Get CPU usage
 cpu_usage=$(top -l 1 -n 0 | awk '/CPU usage/ {
