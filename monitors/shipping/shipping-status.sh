@@ -1,6 +1,7 @@
 #!/bin/bash
 
 TOKEN_FILE="$(dirname $0)/.api_token"
+SNAPSHOT_FILE="$(dirname $0)/.snapshot"
 API_URL="https://onetracker.app/api/parcels?archived=false"
 ARCHIVE_SH="$(dirname $0)/archive.sh"
 
@@ -27,6 +28,24 @@ if [[ "$rpc_status" != "ok" ]]; then
   exit 1
 fi
 
+if [[ -f "$SNAPSHOT_FILE" ]]; then
+  prev_snapshot=$(<"$SNAPSHOT_FILE")
+fi
+new_snapshot=$(echo "$response" | jq -r '
+[.parcels[] | {
+  id: "\(.id)",
+  status: "\(.tracking_status)",
+  location: "\(.tracking_location)"
+}] | tojson')
+echo "$new_snapshot" > "$SNAPSHOT_FILE.tmp"
+
+if [[ "$new_snapshot" != "$prev_snapshot" ]]; then
+  # Show a filled icon when there is update
+  symbol="shippingbox.fill"
+else
+  symbol="shippingbox"
+fi
+
 menu_items=$(echo "$response" | jq -r '
     def to_camel_case:
       split("_")
@@ -51,11 +70,8 @@ top_menu_items='{"text": "Open OneTracker", "click": "/usr/bin/open https://onet
 
 delivered_pkg_ids=$(echo "$response" | jq -r '[.parcels[] | select(.tracking_status == "delivered") | .id] | join(" ")')
 if [[ -n "$delivered_pkg_ids" ]]; then
-  symbol="shippingbox.fill"
   archive_cmd="$ARCHIVE_SH $delivered_pkg_ids"
   top_menu_items+=', {"text": "Archive delivered", "click": "'$archive_cmd'", "refresh": true}'
-else
-  symbol="shippingbox"
 fi
 
 top_menu_items+=', {"text": "-"}'
@@ -68,5 +84,6 @@ echo '
 {
   "imagesymbol": "'$symbol'",
   "text": "",
-  "menus": '$menu_items'
+  "menus": '$menu_items',
+  "menuopen": "/bin/mv '$SNAPSHOT_FILE'.tmp '$SNAPSHOT_FILE'"
 }'
