@@ -12,6 +12,10 @@
   NSMutableDictionary *menuCommandMap;
   // A set of menu items that would trigger a refresh after executing
   NSMutableSet *refreshingMenuItems;
+  // Command to run when menu is open
+  Command *menuOpenCommand;
+  // Command to run when menu is closed
+  Command *menuCloseCommand;
 }
 
 @synthesize command;
@@ -36,7 +40,8 @@
     statusBarButton = statusItem.button;
 
     statusMenu = [NSMenu new];
-    [statusItem setMenu: statusMenu];
+    statusItem.menu = statusMenu;
+    statusMenu.delegate = self;
     updateMenuItem = [[NSMenuItem alloc] initWithTitle: @"Refresh"
                                                 action: @selector(updateMenuAction:)
                                          keyEquivalent: @"r"];
@@ -150,6 +155,19 @@
   [statusMenu addItem: updateMenuItem];
   [statusMenu addItem: quitMenuItem];
 
+  NSString *menuOpen = [jsonObject objectForKey: @"menuopen"];
+  if (menuOpen != nil) {
+    menuOpenCommand = [[Command alloc] initWithLaunchString: menuOpen];
+  } else {
+    menuOpenCommand = nil;
+  }
+  NSString *menuClose = [jsonObject objectForKey: @"menuclose"];
+  if (menuClose != nil) {
+    menuCloseCommand = [[Command alloc] initWithLaunchString: menuClose];
+  } else {
+    menuCloseCommand = nil;
+  }
+
   return 0;
 }
 
@@ -260,6 +278,19 @@
                                    alpha:1.0];
 }
 
+- (void) menuWillOpen: (NSMenu *) menu {
+    if (menuOpenCommand != nil) {
+      NSLog(@"Executing menu open command");
+      [menuOpenCommand execute];
+    }
+}
+
+- (void) menuDidClose: (NSMenu *) menu {
+    if (menuCloseCommand != nil) {
+      NSLog(@"Executing menu close command");
+      [menuCloseCommand execute];
+    }
+}
 @end
 
 /* vim: set ft=objc: */

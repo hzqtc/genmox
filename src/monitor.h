@@ -1,7 +1,7 @@
 #import <Foundation/Foundation.h>
 #import "command.h"
 
-@interface Monitor: NSObject
+@interface Monitor: NSObject<NSMenuDelegate>
 
 @property (nonatomic) Command *command;
 @property (nonatomic) int interval;
