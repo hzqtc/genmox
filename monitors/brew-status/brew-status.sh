@@ -2,6 +2,7 @@
 
 brew="/opt/homebrew/bin/brew"
 brew_upgrade="$(dirname $0)/brew-upgrade.as"
+brew_cleanup="$(dirname $0)/brew-cleanup.as"
 parallel="/opt/homebrew/bin/parallel"
 notifier="/opt/homebrew/bin/terminal-notifier"
 
@@ -32,7 +33,7 @@ if [[ -z "$pkgs" ]]; then
   {
     "imagesymbol": "circle",
     "text": "",
-    "menus": [{"text": "Up to date"}]
+    "menus": [{"text": "Up to date"}, {"text": "Clean up", "click": "'$brew_cleanup'"}]
   }'
   exit 0
 fi

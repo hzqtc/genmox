@@ -1,12 +1,12 @@
 #!/usr/bin/osascript
 
-set upgradeCommand to "brew upgrade"
+set cleanupCommand to "brew cleanup --prune=all"
 
 tell application "Terminal"
   if not (exists window 1) then
-    do script upgradeCommand
+    do script cleanupCommand
   else
-    do script upgradeCommand in window 1
+    do script cleanupCommand in window 1
   end if
   activate
 end tell
