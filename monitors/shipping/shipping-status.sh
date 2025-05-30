@@ -54,7 +54,7 @@ menu_items=$(echo "$response" | jq -r '
 
     [.parcels[] | {
       text: "\(.description): \(.tracking_status | to_camel_case)",
-      subtext: "\(.tracking_location)",
+      subtext: "\(.tracking_location) - \(.tracking_status_readable)",
       badge: "\(.carrier)",
       click: "/usr/bin/open \(
         if .carrier == "USPS" then "https://tools.usps.com/go/TrackConfirmAction?tLabels=\(.tracking_id)"
