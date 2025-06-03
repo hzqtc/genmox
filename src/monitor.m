@@ -183,10 +183,13 @@
     NSString *menuItemChecked = [menuObj objectForKey: @"checked"];
     BOOL menuItemRefresh = [[menuObj objectForKey: @"refresh"] boolValue];
     NSArray *submenuObjs = [menuObj objectForKey: @"submenus"];
+    BOOL isSectionHeader = [[menuObj objectForKey: @"sectionheader"] boolValue];
 
     NSMenuItem *menuItem;
     if ([menuItemTitle isEqualToString: @"-"]) {
       menuItem = [NSMenuItem separatorItem];
+    } else if (isSectionHeader) {
+      menuItem = [NSMenuItem sectionHeaderWithTitle: menuItemTitle];
     } else if (menuItemTitle && [menuItemTitle length] > 0) {
       menuItem = [[NSMenuItem alloc] initWithTitle: menuItemTitle
                                             action: nil

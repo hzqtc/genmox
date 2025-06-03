@@ -46,25 +46,47 @@ else
   symbol="shippingbox"
 fi
 
-menu_items=$(echo "$response" | jq -r '
-    def to_camel_case:
-      split("_")
-          | map( if length > 0 then (.[:1] | ascii_upcase) + .[1:] else "" end )
-          | join(" ");
+common_jq='
+  def tracking_url:
+    if .carrier == "USPS" then "https://tools.usps.com/go/TrackConfirmAction?tLabels=\(.tracking_id)"
+    elif .carrier == "UPS" then "https://www.ups.com/track?tracknum=\(.tracking_id)"
+    elif .carrier == "FedEx" then "https://www.fedex.com/apps/fedextrack/?tracknumbers=\(.tracking_id)"
+    elif .carrier == "DHL" then "https://www.dhl.com/global-en/home/tracking.html?tracking-id=\(.tracking_id)"
+    else "https://www.google.com/search?q=\(.carrier)+\(.tracking_id)"
+    end;
+  def to_camel_case:
+    split("_")
+        | map( if length > 0 then (.[:1] | ascii_upcase) + .[1:] else "" end )
+        | join(" ");
+'
 
-    [.parcels[] | {
-      text: "\(.description): \(.tracking_status | to_camel_case)",
-      subtext: "\(.tracking_location) - \(.tracking_status_readable)",
+delivered_menu_items=$(echo "$response" | jq -r '
+  '"$common_jq"'
+  [.parcels[]
+  | select(.tracking_status == "delivered")
+  | {
+      text: "\(.description)",
+      subtext: "\(.tracking_status_readable)",
       badge: "\(.carrier)",
-      click: "/usr/bin/open \(
-        if .carrier == "USPS" then "https://tools.usps.com/go/TrackConfirmAction?tLabels=\(.tracking_id)"
-        elif .carrier == "UPS" then "https://www.ups.com/track?loc=en_US&tracknum=\(.tracking_id)"
-        elif .carrier == "FedEx" then "https://www.fedex.com/apps/fedextrack/?tracknumbers=\(.tracking_id)"
-        elif .carrier == "DHL" then "https://www.dhl.com/global-en/home/tracking.html?tracking-id=\(.tracking_id)"
-        else "https://www.google.com/search?q=\(.carrier)+\(.tracking_id)"
-        end
-      )"
+      click: "/usr/bin/open \(tracking_url)"
     }] | tojson')
+if [[ "$delivered_menu_items" != "[]" ]]; then
+  delivered_menu_section='{"text": "Delivered", "sectionheader": true}'
+fi
+
+undelivered_menu_items=$(echo "$response" | jq -r '
+  '"$common_jq"'
+  [.parcels[]
+    | select(.tracking_status != "delivered")
+    | {
+        text: "\(.description)",
+        subtext: "\(.tracking_status | to_camel_case) - \(.tracking_location)",
+        badge: "\(.carrier)",
+        click: "/usr/bin/open \(tracking_url)"
+      }] | tojson')
+if [[ "$undelivered_menu_items" != "[]" ]]; then
+  undelivered_menu_section='{"text": "In progress", "sectionheader": true}'
+fi
 
 top_menu_items='{"text": "Open OneTracker", "click": "/usr/bin/open https://onetracker.app/parcels"}'
 
@@ -75,10 +97,15 @@ if [[ -n "$delivered_pkg_ids" ]]; then
 fi
 
 top_menu_items+=', {"text": "-"}'
-if [[ "$menu_items" == "[]" ]]; then
+if [[ "$delivered_menu_items" == "[]" && "$undelivered_menu_items" == "[]" ]]; then
   top_menu_items+=', {"text": "No pakcages"}'
 fi
-menu_items=$(jq -s 'add' <(echo "[$top_menu_items]") <(echo "$menu_items"))
+menu_items=$(jq -s 'add' \
+  <(echo "[$top_menu_items]") \
+  <(echo "[$delivered_menu_section]") \
+  <(echo "$delivered_menu_items") \
+  <(echo "[$undelivered_menu_section]") \
+  <(echo "$undelivered_menu_items"))
 
 echo '
 {
