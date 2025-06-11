@@ -54,6 +54,10 @@ common_jq='
     elif .carrier == "DHL" then "https://www.dhl.com/global-en/home/tracking.html?tracking-id=\(.tracking_id)"
     else "https://www.google.com/search?q=\(.carrier)+\(.tracking_id)"
     end;
+  def description:
+    if .description == "" then .tracking_id
+    else .description
+    end;
   def to_camel_case:
     split("_")
         | map( if length > 0 then (.[:1] | ascii_upcase) + .[1:] else "" end )
@@ -65,7 +69,7 @@ delivered_menu_items=$(echo "$response" | jq -r '
   [.parcels[]
   | select(.tracking_status == "delivered")
   | {
-      text: "\(.description)",
+      text: "\(description)",
       subtext: "\(.tracking_status_readable)",
       badge: "\(.carrier)",
       click: "/usr/bin/open \(tracking_url)"
@@ -79,7 +83,7 @@ undelivered_menu_items=$(echo "$response" | jq -r '
   [.parcels[]
     | select(.tracking_status != "delivered")
     | {
-        text: "\(.description)",
+        text: "\(description)",
         subtext: "\(.tracking_status | to_camel_case) - \(.tracking_location)",
         badge: "\(.carrier)",
         click: "/usr/bin/open \(tracking_url)"
