@@ -1,6 +1,6 @@
-CC=clang
-CFLAGS=-fobjc-arc
-LDFLAGS=-framework Cocoa
+CC = clang
+CFLAGS = -fobjc-arc
+LDFLAGS = -framework Cocoa
 
 SRC = $(wildcard *.m)
 OBJ = $(SRC:.m=.o)

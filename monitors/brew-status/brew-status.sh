@@ -26,7 +26,7 @@ fi
 
 # Update brew and check for outdated packages
 $brew update > /dev/null 2>&1
-pkgs=$($brew outdated --verbose)
+pkgs=$($brew outdated --quiet)
 
 if [[ -z "$pkgs" ]]; then
   echo '
@@ -39,17 +39,16 @@ if [[ -z "$pkgs" ]]; then
 fi
 
 get_pkg_menuitem() {
-  # pkg is a string in "name (old_version) < new_version"
-  local pkg="$1"
-  local name=${pkg% (*}
-  local new_version=${pkg#*< }
-  local brew_info=$($brew info --json $name)
-  local desc=$(echo $brew_info | jq -r '.[0] | .desc')
-  local url=$(echo $brew_info | jq -r '.[0] | .homepage')
+  local name="$1"
+  local brew_info=$($brew info --json=v2 $name)
+  local current_version=$(echo $brew_info | jq -r '(.formulae[0] // .casks[0]).installed')
+  local new_version=$(echo $brew_info | jq -r '(.formulae[0] // .casks[0]).version')
+  local desc=$(echo $brew_info | jq -r '(.formulae[0] // .casks[0]).desc')
+  local url=$(echo $brew_info | jq -r '(.formulae[0] // .casks[0]).homepage')
   echo '{
     "text": "'$name'",
     "subtext": "'$desc'",
-    "badge": "'$new_version'",
+    "badge": "'$current_version' → '$new_version'",
     "click": "/usr/bin/open '$url'"
   },'
 }
