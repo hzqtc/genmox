@@ -41,10 +41,19 @@ fi
 get_pkg_menuitem() {
   local name="$1"
   local brew_info=$($brew info --json=v2 $name)
-  local current_version=$(echo $brew_info | jq -r '(.formulae[0] // .casks[0]).installed')
-  local new_version=$(echo $brew_info | jq -r '(.formulae[0] // .casks[0]).version')
-  local desc=$(echo $brew_info | jq -r '(.formulae[0] // .casks[0]).desc')
-  local url=$(echo $brew_info | jq -r '(.formulae[0] // .casks[0]).homepage')
+  local formulae=$(echo $brew_info | jq -r '.formulae[0]')
+  local cask=$(echo $brew_info | jq -r '.casks[0]')
+  if [[ $formulae != 'null' ]]; then
+    local desc=$(echo $formulae | jq -r '.desc')
+    local url=$(echo $formulae | jq -r '.homepage')
+    local current_version=$(echo $formulae | jq -r '.installed[0].version')
+    local new_version=$(echo $formulae | jq -r '.versions.stable')
+  elif [[ $cask != 'null' ]]; then
+    local desc=$(echo $cask | jq -r '.desc')
+    local url=$(echo $cask | jq -r '.homepage')
+    local current_version=$(echo $cask| jq -r '.installed')
+    local new_version=$(echo $cask | jq -r '.version')
+  fi
   echo '{
     "text": "'$name'",
     "subtext": "'$desc'",
