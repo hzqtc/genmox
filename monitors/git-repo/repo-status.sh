@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
 
-DIR="${1:-.}"
-
-for cmd in git jq parallel tokei; do
+required_cmds=(git jq parallel tokei)
+for cmd in "${required_cmds[@]}"; do
   if ! command -v "$cmd" &>/dev/null; then
-    echo "$cmd is required"
+    echo "$cmd is required" >&2
     exit 1
   fi
 done
@@ -58,8 +57,8 @@ repo_status() {
   unstaged=$(git diff --shortstat 2>/dev/null)
   staged=$(git diff --shortstat --cached 2>/dev/null)
 
-  read ins1 del1 <<< $(parse_diff "$unstaged")
-  read ins2 del2 <<< $(parse_diff "$staged")
+  read -r ins1 del1 <<< "$(parse_diff "$unstaged")"
+  read -r ins2 del2 <<< "$(parse_diff "$staged")"
 
   insertions=$((ins1 + ins2))
   deletions=$((del1 + del2))
@@ -69,7 +68,7 @@ repo_status() {
   remote_branch=$(git rev-parse --abbrev-ref "$local_branch@{u}" 2>/dev/null)
   if [[ -n "$remote_branch" ]]; then
     git remote update -p &>/dev/null
-    read ahead behind <<< $(git rev-list --left-right --count "$local_branch...$remote_branch" 2>/dev/null)
+    read -r ahead behind <<< "$(git rev-list --left-right --count "$local_branch...$remote_branch" 2>/dev/null)"
     ahead=${ahead:-0}
     behind=${behind:-0}
   fi
@@ -101,7 +100,7 @@ repo_status() {
     text="$name: Uncommitted changes: $insertions+/$deletions-"
   elif [[ -n "$remote_branch" ]]; then
     if (( ahead > 0 || behind > 0 )); then
-      text="$name: $ahead ahead / $behind behind of remote"
+      text="$name: $ahead ahead / $behind behind of $remote_branch"
     else
       text="$name: Up to date"
     fi
@@ -128,6 +127,7 @@ export -f repo_status
 export -f format_duration
 
 # --- Find Git directories and process in parallel with preserved order ---
+DIR="${1:-.}"
 menu_items=$(find "$DIR" -mindepth 1 -maxdepth 1 -type d -exec test -d '{}/.git' \; -print | parallel repo_status | jq -s .)
 
 all_up_to_date=$(echo "$menu_items" | jq 'all(.[]; (.text | contains("Up to date")))')
