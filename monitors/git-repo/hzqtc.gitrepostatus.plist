@@ -8,7 +8,7 @@
   <key>ProgramArguments</key>
   <array>
     <string>/Users/hzqtc/Code/genmox/src/genmox</string>
-    <string>1800</string>
+    <string>30</string>
     <string>/Users/hzqtc/Code/genmox/monitors/git-repo/repo-status.sh</string>
   </array>
 
