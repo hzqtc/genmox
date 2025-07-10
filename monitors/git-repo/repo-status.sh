@@ -93,14 +93,14 @@ repo_status() {
   local badge=""
   local text=""
   local subtext=""
-  local click="/usr/bin/open $repo"
+  local click=""
 
   # text shows the sync status of remote branch
   if (( insertions > 0 || deletions > 0 )); then
-    text="$name: Uncommitted changes: $insertions+/$deletions-"
+    text="$name: Uncommitted (+$insertions / -$deletions)"
   elif [[ -n "$remote_branch" ]]; then
     if (( ahead > 0 || behind > 0 )); then
-      text="$name: $ahead ahead / $behind behind of $remote_branch"
+      text="$name: Unsynced ($ahead ahead / $behind behind)"
     else
       text="$name: Up to date"
     fi
@@ -117,6 +117,18 @@ repo_status() {
 
   # badge shows the primary language
   badge="$primary_lang"
+
+  # Click opens the remote repo url
+  remote_url=$(git config --get remote.origin.url || echo "")
+  if [[ "$remote_url" == git@* ]]; then
+    remote_url="https://${remote_url#git@}"
+    remote_url="${remote_url/:/\/}"
+    remote_url="${remote_url%.git}"
+  elif [[ "$remote_url" == http* ]]; then
+    remote_url="${remote_url%.git}"
+  fi
+
+  click="/usr/bin/open $remote_url"
 
   # --- Output as JSON ---
   jq -n --arg text "$text" --arg click "$click" --arg badge "$badge" --arg subtext "$subtext" \
