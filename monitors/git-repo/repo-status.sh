@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 
-required_cmds=(git jq parallel tokei)
-for cmd in "${required_cmds[@]}"; do
+export parallel="/opt/homebrew/bin/parallel"
+export tokei="/opt/homebrew/bin/tokei"
+
+for cmd in git jq "$parallel" "$tokei"; do
   if ! command -v "$cmd" &>/dev/null; then
-    echo "$cmd is required" >&2
+    echo "Missing command: $cmd" >&2
     exit 1
   fi
 done
@@ -15,13 +17,20 @@ format_duration() {
   local days=$(((seconds % 604800) / 86400))
   local hours=$(((seconds % 86400) / 3600))
 
+
+  pluralize() {
+    local n=$1
+    local word=$2
+    [[ "$n" == "1" ]] && echo "$n $word" || echo "$n ${word}s"
+  }
+
   local duration=""
   if (( weeks > 0 )); then
-    duration="${weeks}weeks"
+    duration="$(pluralize ${weeks} week)"
   elif (( days > 0 )); then
-    duration="${days}days"
+    duration="$(pluralize ${days} day)"
   elif (( hours > 0 )); then
-    duration="${hours}hours"
+    duration="$(pluralize ${hours} hour)"
   fi
 
   if [[ -z "$duration" ]]; then
@@ -84,7 +93,7 @@ repo_status() {
   fi
 
   # --- Code stats ---
-  tokei_json=$(tokei . --output json)
+  tokei_json=$($tokei . --output json)
   # Primary language is the one with most lines of code
   primary_lang=$(echo "$tokei_json" \
     | jq -r 'del(.Total) | to_entries | map(select(.value.code > 0)) | if length == 0 then "" else max_by(.value.code).key end')
@@ -128,7 +137,11 @@ repo_status() {
     remote_url="${remote_url%.git}"
   fi
 
-  click="/usr/bin/open $remote_url"
+  if [[ -n "$remote_url" ]]; then
+    click="/usr/bin/open $remote_url"
+  else
+    click=""
+  fi
 
   # --- Output as JSON ---
   # last_commit key is only used for sorting would be ignored by genmox
@@ -144,9 +157,9 @@ export -f repo_status
 export -f format_duration
 
 # --- Find Git directories and process in parallel ---
-DIR="${1:-.}"
+DIR="/Users/hzqtc/Code"
 menu_items=$(find "$DIR" -mindepth 1 -maxdepth 1 -type d -exec test -d '{}/.git' \; -print \
-  | parallel repo_status \
+  | $parallel repo_status \
   | jq -s 'sort_by(-.last_commit)')
 
 all_up_to_date=$(echo "$menu_items" | jq 'all(.[]; (.text | contains("Up to date")))')
