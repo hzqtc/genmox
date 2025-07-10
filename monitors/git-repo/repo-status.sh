@@ -131,22 +131,29 @@ repo_status() {
   click="/usr/bin/open $remote_url"
 
   # --- Output as JSON ---
-  jq -n --arg text "$text" --arg click "$click" --arg badge "$badge" --arg subtext "$subtext" \
-    '{text: $text, click: $click, badge: $badge, subtext: $subtext}'
+  # last_commit key is only used for sorting would be ignored by genmox
+  jq -n --arg text "$text" \
+    --arg click "$click" \
+    --arg badge "$badge" \
+    --arg subtext "$subtext" \
+    --argjson last_commit "${last_commit_unix:-0}" \
+    '{text: $text, click: $click, badge: $badge, subtext: $subtext, last_commit: $last_commit}'
 }
 
 export -f repo_status
 export -f format_duration
 
-# --- Find Git directories and process in parallel with preserved order ---
+# --- Find Git directories and process in parallel ---
 DIR="${1:-.}"
-menu_items=$(find "$DIR" -mindepth 1 -maxdepth 1 -type d -exec test -d '{}/.git' \; -print | parallel repo_status | jq -s .)
+menu_items=$(find "$DIR" -mindepth 1 -maxdepth 1 -type d -exec test -d '{}/.git' \; -print \
+  | parallel repo_status \
+  | jq -s 'sort_by(-.last_commit)')
 
 all_up_to_date=$(echo "$menu_items" | jq 'all(.[]; (.text | contains("Up to date")))')
 if [[ "$all_up_to_date" == "true" ]]; then
-  symbol="checkmark.circle.fill"
+  symbol="checkmark.icloud"
 else
-  symbol="flag.circle.fill"
+  symbol="arrow.trianglehead.2.clockwise.rotate.90.icloud"
 fi
 
 jq -n --arg symbol "$symbol" --argjson menus "$menu_items" \
