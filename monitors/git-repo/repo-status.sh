@@ -58,8 +58,8 @@ repo_status() {
   # --- Accumulate uncommitted (staged + unstaged) changes ---
   parse_diff() {
     local stat="$1"
-    local ins=$(echo "$stat" | grep -o '[0-9]\+ insertions' | grep -o '[0-9]\+' || echo 0)
-    local del=$(echo "$stat" | grep -o '[0-9]\+ deletions' | grep -o '[0-9]\+' || echo 0)
+    local ins=$(echo "$stat" | grep -o '[0-9]\+ insertion\(s\)\?' | grep -o '[0-9]\+' || echo 0)
+    local del=$(echo "$stat" | grep -o '[0-9]\+ deletion\(s\)\?' | grep -o '[0-9]\+' || echo 0)
     echo $((ins)) $((del))
   }
 
@@ -162,7 +162,7 @@ menu_items=$(find "$DIR" -mindepth 1 -maxdepth 1 -type d -exec test -d '{}/.git'
   | $parallel repo_status \
   | jq -s 'sort_by(-.last_commit)')
 
-all_up_to_date=$(echo "$menu_items" | jq 'all(.[]; (.text | contains("Up to date")))')
+all_up_to_date=$(echo "$menu_items" | jq 'all(.[]; (.text | test("Up to date|No remote repo set")))')
 if [[ "$all_up_to_date" == "true" ]]; then
   symbol="checkmark.icloud"
 else
