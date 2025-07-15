@@ -12,18 +12,13 @@ fi
 
 source "$TOKEN_FILE"
 
-expiration_epoch=$(date -jf "%Y-%m-%dT%H:%M:%S" "${expiration:0:19}" +%s 2>/dev/null)
-now_epoch=$(date +%s)
-
-if (( now_epoch >= expiration_epoch )); then
-  echo '{"text": "Token has expired", "imagesymbol": "exclamationmark.triangle"}'
-  exit 1
-fi
-
 response=$(curl -s "$API_URL" -H "Cookie: api_token=$token")
 rpc_status=$(echo "$response" | jq -r '.message')
 
-if [[ "$rpc_status" != "ok" ]]; then
+if [[ "$rpc_status" == "Invalid API token" ]]; then
+  echo '{"text": "API Token expired", "imagesymbol": "exclamationmark.triangle"}'
+  exit 1
+elif [[ "$rpc_status" != "ok" ]]; then
   echo '{"text": "API failed", "imagesymbol": "exclamationmark.triangle"}'
   exit 1
 fi
