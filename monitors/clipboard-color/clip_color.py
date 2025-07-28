@@ -185,7 +185,7 @@ def format_results(results: dict) -> str:
 
 
 def main():
-    MAX_RESULT_NUM = 20
+    MAX_RESULT_NUM = 10
     results = {}
 
     # Add entries from history
