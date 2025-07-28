@@ -176,6 +176,7 @@
   for (NSDictionary *menuObj in menuObjs) {
     NSString *menuItemTitle = [menuObj objectForKey:@"text"];
     NSString *menuItemTitleColor = [menuObj objectForKey:@"textcolor"];
+    NSString *menuItemImageColor = [menuObj objectForKey:@"imagecolor"];
     NSString *menuItemSubtitle = [menuObj objectForKey:@"subtext"];
     NSString *menuItemBadge = [menuObj objectForKey:@"badge"];
     NSString *menuItemCommand = [menuObj objectForKey:@"click"];
@@ -205,6 +206,21 @@
             [[NSAttributedString alloc] initWithString:menuItemTitle
                                             attributes:attributes];
         menuItem.attributedTitle = attributedTitle;
+      }
+      if (menuItemImageColor != nil) {
+        NSSize size = NSMakeSize(16, 16);
+        NSColor *color = [self colorFromHexString:menuItemImageColor];
+        CGFloat cornerRadius = 4.0; // Adjust as needed
+        NSImage *image = [[NSImage alloc] initWithSize:size];
+        [image lockFocus];
+        [color setFill];
+        NSBezierPath *path = [NSBezierPath
+            bezierPathWithRoundedRect:NSMakeRect(0, 0, size.width, size.height)
+                              xRadius:cornerRadius
+                              yRadius:cornerRadius];
+        [path fill];
+        [image unlockFocus];
+        menuItem.image = image;
       }
       if (menuItemSubtitle != nil) {
         menuItem.subtitle = menuItemSubtitle;
