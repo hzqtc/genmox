@@ -176,7 +176,7 @@ def format_results(results: dict) -> str:
                 "text": color_str,
                 "imagecolor": hex_str,
                 "subtext": hex_str,
-                "click": f"https://www.color-hex.com/color/{hex_code}",
+                "click": f"/usr/bin/open https://www.color-hex.com/color/{hex_code}",
             }
         )
     return json.dumps(
