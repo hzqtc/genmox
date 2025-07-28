@@ -1,0 +1,6 @@
+[project]
+name = "clipboard-color"
+version = "0.1.0"
+description = "Extract color strings in multiple formats from system clipboard"
+requires-python = ">=3.12"
+dependencies = []
