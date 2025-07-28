@@ -1,5 +1,5 @@
-#import <Cocoa/Cocoa.h>
 #import "monitor.h"
+#import <Cocoa/Cocoa.h>
 
 @implementation Monitor {
   NSTimer *timer;
@@ -20,43 +20,45 @@
 
 @synthesize command;
 
--(int) interval {
+- (int)interval {
   return [timer timeInterval];
 }
 
--(void) setInterval: (int) checkInterval {
+- (void)setInterval:(int)checkInterval {
   [timer invalidate];
   timer = nil;
-  timer = [NSTimer scheduledTimerWithTimeInterval: checkInterval
-                                           target: self
-                                         selector: @selector(monitorRoutine)
-                                         userInfo: nil
-                                          repeats: YES];
+  timer = [NSTimer scheduledTimerWithTimeInterval:checkInterval
+                                           target:self
+                                         selector:@selector(monitorRoutine)
+                                         userInfo:nil
+                                          repeats:YES];
 }
 
--(id) init {
+- (id)init {
   if (self = [super init]) {
-    statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength: NSVariableStatusItemLength];
+    statusItem = [[NSStatusBar systemStatusBar]
+        statusItemWithLength:NSVariableStatusItemLength];
     statusBarButton = statusItem.button;
 
     statusMenu = [NSMenu new];
     statusItem.menu = statusMenu;
     statusMenu.delegate = self;
-    updateMenuItem = [[NSMenuItem alloc] initWithTitle: @"Refresh"
-                                                action: @selector(updateMenuAction:)
-                                         keyEquivalent: @"r"];
-    [updateMenuItem setTarget: self];
-    quitMenuItem = [[NSMenuItem alloc] initWithTitle: @"Quit"
-                                              action: @selector(terminate:)
-                                       keyEquivalent: @"q"];
+    updateMenuItem =
+        [[NSMenuItem alloc] initWithTitle:@"Refresh"
+                                   action:@selector(updateMenuAction:)
+                            keyEquivalent:@"r"];
+    [updateMenuItem setTarget:self];
+    quitMenuItem = [[NSMenuItem alloc] initWithTitle:@"Quit"
+                                              action:@selector(terminate:)
+                                       keyEquivalent:@"q"];
 
-    menuCommandMap = [NSMutableDictionary dictionaryWithCapacity: 100];
-    refreshingMenuItems = [NSMutableSet setWithCapacity: 100];
+    menuCommandMap = [NSMutableDictionary dictionaryWithCapacity:100];
+    refreshingMenuItems = [NSMutableSet setWithCapacity:100];
   }
   return self;
 }
 
--(id) initWithCommand: (Command *) initCommand andInterval: (int) checkInterval {
+- (id)initWithCommand:(Command *)initCommand andInterval:(int)checkInterval {
   if ([self init]) {
     self.command = initCommand;
     self.interval = checkInterval;
@@ -64,106 +66,104 @@
   return self;
 }
 
--(void) start {
+- (void)start {
   [self monitorRoutine];
 }
 
--(void) updateMenuAction: (id) sender {
+- (void)updateMenuAction:(id)sender {
   [self monitorRoutine];
 }
 
--(void) monitorRoutine {
+- (void)monitorRoutine {
   NSData *commandOutput;
 
   if (command) {
     NSLog(@"Execute command: %@", [command description]);
     commandOutput = [command execute];
-  }
-  else {
+  } else {
     NSLog(@"No command specified.");
-    [NSApp terminate: self];
+    [NSApp terminate:self];
   }
 
   if (commandOutput) {
-    if ([self parseCommandOutputInJSON: commandOutput] != 0) {
+    if ([self parseCommandOutputInJSON:commandOutput] != 0) {
       NSLog(@"Command gives incorrect output.");
-      [NSApp terminate: self];
+      [NSApp terminate:self];
     }
-  }
-  else {
-    [NSApp terminate: self];
+  } else {
+    [NSApp terminate:self];
   }
 }
 
--(int) parseCommandOutputInJSON: (NSData *) jsonData {
+- (int)parseCommandOutputInJSON:(NSData *)jsonData {
   NSError *e = nil;
-  NSDictionary *jsonObject = [NSJSONSerialization JSONObjectWithData: jsonData
-                                                             options: 0
-                                                               error: &e];
+  NSDictionary *jsonObject = [NSJSONSerialization JSONObjectWithData:jsonData
+                                                             options:0
+                                                               error:&e];
   if (jsonObject == nil) {
     NSLog(@"JSON parse error: %@", e);
     return -1;
   }
 
-  NSString *title = [jsonObject objectForKey: @"text"];
+  NSString *title = [jsonObject objectForKey:@"text"];
   if (title == nil) {
     NSLog(@"text is missing");
     return -1;
   }
 
-  NSString *textColor = [jsonObject objectForKey: @"textcolor"];
+  NSString *textColor = [jsonObject objectForKey:@"textcolor"];
   if (textColor != nil) {
     NSDictionary *attributes = @{
-      NSForegroundColorAttributeName: [self colorFromHexString: textColor],
-                 NSFontAttributeName: [NSFont systemFontOfSize: [NSFont systemFontSize]]
+      NSForegroundColorAttributeName : [self colorFromHexString:textColor],
+      NSFontAttributeName : [NSFont systemFontOfSize:[NSFont systemFontSize]]
     };
-    NSAttributedString *attributedTitle = [[NSAttributedString alloc] initWithString: title
-                                                                          attributes: attributes];
+    NSAttributedString *attributedTitle =
+        [[NSAttributedString alloc] initWithString:title attributes:attributes];
     statusBarButton.attributedTitle = attributedTitle;
   } else {
     statusBarButton.title = title;
   }
 
-  NSString *imageSymbol = [jsonObject objectForKey: @"imagesymbol"];
-  NSString *imagePath = [jsonObject objectForKey: @"image"];
+  NSString *imageSymbol = [jsonObject objectForKey:@"imagesymbol"];
+  NSString *imagePath = [jsonObject objectForKey:@"image"];
   NSImage *image;
   if (imageSymbol != nil) {
-    image = [NSImage imageWithSystemSymbolName: imageSymbol
-                      accessibilityDescription: @""];
+    image = [NSImage imageWithSystemSymbolName:imageSymbol
+                      accessibilityDescription:@""];
   } else if (imagePath != nil) {
-    image = [[NSImage alloc] initWithContentsOfFile: imagePath];
+    image = [[NSImage alloc] initWithContentsOfFile:imagePath];
   }
   if (image != nil) {
     image.template = YES;
     statusBarButton.image = image;
   }
 
-  statusBarButton.toolTip = [jsonObject objectForKey: @"tooltip"];
+  statusBarButton.toolTip = [jsonObject objectForKey:@"tooltip"];
 
   [statusMenu removeAllItems];
   [menuCommandMap removeAllObjects];
   [refreshingMenuItems removeAllObjects];
-  NSArray *menuObjs = [jsonObject objectForKey: @"menus"];
-  NSArray<NSMenuItem *> *menuItems = [self getMenuItems: menuObjs];
+  NSArray *menuObjs = [jsonObject objectForKey:@"menus"];
+  NSArray<NSMenuItem *> *menuItems = [self getMenuItems:menuObjs];
   for (NSMenuItem *item in menuItems) {
-    [statusMenu addItem: item];
+    [statusMenu addItem:item];
   }
 
   if ([statusMenu numberOfItems] > 0) {
-    [statusMenu addItem: [NSMenuItem separatorItem]];
+    [statusMenu addItem:[NSMenuItem separatorItem]];
   }
-  [statusMenu addItem: updateMenuItem];
-  [statusMenu addItem: quitMenuItem];
+  [statusMenu addItem:updateMenuItem];
+  [statusMenu addItem:quitMenuItem];
 
-  NSString *menuOpen = [jsonObject objectForKey: @"menuopen"];
+  NSString *menuOpen = [jsonObject objectForKey:@"menuopen"];
   if (menuOpen != nil) {
-    menuOpenCommand = [[Command alloc] initWithLaunchString: menuOpen];
+    menuOpenCommand = [[Command alloc] initWithLaunchString:menuOpen];
   } else {
     menuOpenCommand = nil;
   }
-  NSString *menuClose = [jsonObject objectForKey: @"menuclose"];
+  NSString *menuClose = [jsonObject objectForKey:@"menuclose"];
   if (menuClose != nil) {
-    menuCloseCommand = [[Command alloc] initWithLaunchString: menuClose];
+    menuCloseCommand = [[Command alloc] initWithLaunchString:menuClose];
   } else {
     menuCloseCommand = nil;
   }
@@ -171,90 +171,96 @@
   return 0;
 }
 
--(NSArray<NSMenuItem *> *) getMenuItems: (NSArray *) menuObjs  {
+- (NSArray<NSMenuItem *> *)getMenuItems:(NSArray *)menuObjs {
   NSMutableArray<NSMenuItem *> *menuItems = [NSMutableArray array];
   for (NSDictionary *menuObj in menuObjs) {
-    NSString *menuItemTitle = [menuObj objectForKey: @"text"];
-    NSString *menuItemTitleColor = [menuObj objectForKey: @"textcolor"];
-    NSString *menuItemSubtitle = [menuObj objectForKey: @"subtext"];
-    NSString *menuItemBadge = [menuObj objectForKey: @"badge"];
-    NSString *menuItemCommand = [menuObj objectForKey: @"click"];
-    NSString *menuItemKeyboard = [menuObj objectForKey: @"keyboard"];
-    NSString *menuItemChecked = [menuObj objectForKey: @"checked"];
-    BOOL menuItemRefresh = [[menuObj objectForKey: @"refresh"] boolValue];
-    NSArray *submenuObjs = [menuObj objectForKey: @"submenus"];
-    BOOL isSectionHeader = [[menuObj objectForKey: @"sectionheader"] boolValue];
+    NSString *menuItemTitle = [menuObj objectForKey:@"text"];
+    NSString *menuItemTitleColor = [menuObj objectForKey:@"textcolor"];
+    NSString *menuItemSubtitle = [menuObj objectForKey:@"subtext"];
+    NSString *menuItemBadge = [menuObj objectForKey:@"badge"];
+    NSString *menuItemCommand = [menuObj objectForKey:@"click"];
+    NSString *menuItemKeyboard = [menuObj objectForKey:@"keyboard"];
+    NSString *menuItemChecked = [menuObj objectForKey:@"checked"];
+    BOOL menuItemRefresh = [[menuObj objectForKey:@"refresh"] boolValue];
+    NSArray *submenuObjs = [menuObj objectForKey:@"submenus"];
+    BOOL isSectionHeader = [[menuObj objectForKey:@"sectionheader"] boolValue];
 
     NSMenuItem *menuItem;
-    if ([menuItemTitle isEqualToString: @"-"]) {
+    if ([menuItemTitle isEqualToString:@"-"]) {
       menuItem = [NSMenuItem separatorItem];
     } else if (isSectionHeader) {
-      menuItem = [NSMenuItem sectionHeaderWithTitle: menuItemTitle];
+      menuItem = [NSMenuItem sectionHeaderWithTitle:menuItemTitle];
     } else if (menuItemTitle && [menuItemTitle length] > 0) {
-      menuItem = [[NSMenuItem alloc] initWithTitle: menuItemTitle
-                                            action: nil
-                                     keyEquivalent: menuItemKeyboard ?: @""];
+      menuItem = [[NSMenuItem alloc] initWithTitle:menuItemTitle
+                                            action:nil
+                                     keyEquivalent:menuItemKeyboard ?: @""];
       if (menuItemTitleColor != nil) {
         NSDictionary *attributes = @{
-          NSForegroundColorAttributeName: [self colorFromHexString: menuItemTitleColor],
-                     NSFontAttributeName: [NSFont systemFontOfSize:[NSFont systemFontSize]]
+          NSForegroundColorAttributeName :
+              [self colorFromHexString:menuItemTitleColor],
+          NSFontAttributeName :
+              [NSFont systemFontOfSize:[NSFont systemFontSize]]
         };
-        NSAttributedString *attributedTitle = [[NSAttributedString alloc] initWithString:menuItemTitle
-                                                                              attributes:attributes];
+        NSAttributedString *attributedTitle =
+            [[NSAttributedString alloc] initWithString:menuItemTitle
+                                            attributes:attributes];
         menuItem.attributedTitle = attributedTitle;
       }
       if (menuItemSubtitle != nil) {
         menuItem.subtitle = menuItemSubtitle;
       }
       if (menuItemBadge != nil) {
-        menuItem.badge = [[NSMenuItemBadge alloc] initWithString: menuItemBadge];
+        menuItem.badge = [[NSMenuItemBadge alloc] initWithString:menuItemBadge];
       }
       if (menuItemCommand && [menuItemCommand length] > 0) {
         menuItem.target = self;
         menuItem.action = @selector(menuAction:);
-        NSNumber *key = [NSNumber numberWithUnsignedInt: [menuItem hash]];
-        [menuCommandMap setObject: menuItemCommand forKey: key];
+        NSNumber *key = [NSNumber numberWithUnsignedInt:[menuItem hash]];
+        [menuCommandMap setObject:menuItemCommand forKey:key];
         if (menuItemRefresh) {
-          [refreshingMenuItems addObject: key];
+          [refreshingMenuItems addObject:key];
         }
       }
 
-      if (menuItemChecked && [menuItemChecked caseInsensitiveCompare:@"true"] == NSOrderedSame) {
+      if (menuItemChecked &&
+          [menuItemChecked caseInsensitiveCompare:@"true"] == NSOrderedSame) {
         menuItem.state = NSControlStateValueOn;
       }
 
       if (submenuObjs && submenuObjs.count > 0) {
         NSMenu *submenu = [NSMenu new];
-        NSArray<NSMenuItem *> *submenuItems = [self getMenuItems: submenuObjs];
+        NSArray<NSMenuItem *> *submenuItems = [self getMenuItems:submenuObjs];
         for (NSMenuItem *item in submenuItems) {
-          [submenu addItem: item];
+          [submenu addItem:item];
         }
         menuItem.submenu = submenu;
       }
     }
 
     if (menuItem) {
-      [menuItems addObject: menuItem];
+      [menuItems addObject:menuItem];
     }
   }
   return [menuItems copy];
 }
 
--(void) menuAction: (id) sender {
-  NSNumber *key = [NSNumber numberWithUnsignedInt: [sender hash]];
-  Command *menuCommand = [[Command alloc] initWithLaunchString: [menuCommandMap objectForKey: key]];
-  [menuCommand execute: ^(NSData *outputData) {
-    if ([refreshingMenuItems containsObject: key]) {
+- (void)menuAction:(id)sender {
+  NSNumber *key = [NSNumber numberWithUnsignedInt:[sender hash]];
+  Command *menuCommand =
+      [[Command alloc] initWithLaunchString:[menuCommandMap objectForKey:key]];
+  [menuCommand execute:^(NSData *outputData) {
+    if ([refreshingMenuItems containsObject:key]) {
       NSLog(@"Refreshing after executing command");
       [self monitorRoutine];
     }
   }];
 }
 
-- (NSColor *) colorFromHexString: (NSString *) hexString {
+- (NSColor *)colorFromHexString:(NSString *)hexString {
   // Trim space and remove # if it exists
-  NSString *colorString = [hexString stringByTrimmingCharactersInSet:
-    [NSCharacterSet whitespaceAndNewlineCharacterSet]];
+  NSString *colorString = [hexString
+      stringByTrimmingCharactersInSet:[NSCharacterSet
+                                          whitespaceAndNewlineCharacterSet]];
   if ([colorString hasPrefix:@"#"]) {
     colorString = [colorString substringFromIndex:1];
   }
@@ -268,11 +274,14 @@
 
   unsigned int r, g, b;
   NSScanner *scanner;
-  scanner = [NSScanner scannerWithString:[colorString substringWithRange:NSMakeRange(0, 2)]];
+  scanner = [NSScanner
+      scannerWithString:[colorString substringWithRange:NSMakeRange(0, 2)]];
   [scanner scanHexInt:&r];
-  scanner = [NSScanner scannerWithString:[colorString substringWithRange:NSMakeRange(2, 2)]];
+  scanner = [NSScanner
+      scannerWithString:[colorString substringWithRange:NSMakeRange(2, 2)]];
   [scanner scanHexInt:&g];
-  scanner = [NSScanner scannerWithString:[colorString substringWithRange:NSMakeRange(4, 2)]];
+  scanner = [NSScanner
+      scannerWithString:[colorString substringWithRange:NSMakeRange(4, 2)]];
   [scanner scanHexInt:&b];
 
   return [NSColor colorWithCalibratedRed:(r / 255.0)
@@ -281,18 +290,18 @@
                                    alpha:1.0];
 }
 
-- (void) menuWillOpen: (NSMenu *) menu {
-    if (menuOpenCommand != nil) {
-      NSLog(@"Executing menu open command");
-      [menuOpenCommand execute];
-    }
+- (void)menuWillOpen:(NSMenu *)menu {
+  if (menuOpenCommand != nil) {
+    NSLog(@"Executing menu open command");
+    [menuOpenCommand execute];
+  }
 }
 
-- (void) menuDidClose: (NSMenu *) menu {
-    if (menuCloseCommand != nil) {
-      NSLog(@"Executing menu close command");
-      [menuCloseCommand execute];
-    }
+- (void)menuDidClose:(NSMenu *)menu {
+  if (menuCloseCommand != nil) {
+    NSLog(@"Executing menu close command");
+    [menuCloseCommand execute];
+  }
 }
 @end
 

@@ -1,20 +1,21 @@
-#import <Foundation/Foundation.h>
 #import "command.h"
+#import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
 
-@interface Monitor: NSObject<NSMenuDelegate>
+@interface Monitor : NSObject <NSMenuDelegate>
 
-@property (nonatomic) Command *command;
-@property (nonatomic) int interval;
+@property(nonatomic) Command *command;
+@property(nonatomic) int interval;
 
--(id) init;
--(id) initWithCommand: (Command *) initCommand andInterval: (int) checkInterval;
+- (id)init;
+- (id)initWithCommand:(Command *)initCommand andInterval:(int)checkInterval;
 
--(void) start;
--(void) monitorRoutine;
+- (void)start;
+- (void)monitorRoutine;
 
--(int) parseCommandOutputInJSON: (NSData *) jsonData;
+- (int)parseCommandOutputInJSON:(NSData *)jsonData;
 
--(void) menuAction: (id) sender;
+- (void)menuAction:(id)sender;
 
 @end
 
