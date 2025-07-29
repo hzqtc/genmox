@@ -16,9 +16,11 @@
   Command *menuOpenCommand;
   // Command to run when menu is closed
   Command *menuCloseCommand;
+  // Flag indicate whether the dropdown is currently open
+  bool isMenuOpen;
 }
 
-@synthesize command, name;
+@synthesize command, name, pauseWhenOpen;
 
 - (int)interval {
   return [timer timeInterval];
@@ -86,6 +88,7 @@
       NSLog(@"[%@] Invalid command interval: %@", name, interval);
       return nil;
     }
+    self.pauseWhenOpen = [config[@"pause_when_open"] boolValue];
   }
   return self;
 }
@@ -110,6 +113,9 @@
 }
 
 - (void)monitorRoutine {
+  if (isMenuOpen && self.pauseWhenOpen) {
+    return;
+  }
   NSLog(@"[%@] Execute command: %@", self.name, [command description]);
   [command execute:^(NSData *commandOutput) {
     if (commandOutput) {
@@ -337,6 +343,7 @@
 }
 
 - (void)menuWillOpen:(NSMenu *)menu {
+  isMenuOpen = true;
   if (menuOpenCommand != nil) {
     NSLog(@"[%@] Executing menu open command", self.name);
     [menuOpenCommand execute];
@@ -344,6 +351,7 @@
 }
 
 - (void)menuDidClose:(NSMenu *)menu {
+  isMenuOpen = false;
   if (menuCloseCommand != nil) {
     NSLog(@"[%@] Executing menu close command", self.name);
     [menuCloseCommand execute];

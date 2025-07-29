@@ -7,6 +7,7 @@
 @property(nonatomic) NSString *name;
 @property(nonatomic) Command *command;
 @property(nonatomic) int interval;
+@property(nonatomic) bool pauseWhenOpen;
 
 - (id)init;
 - (id)initWithConfig:(NSDictionary *)config;
