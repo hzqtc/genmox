@@ -39,45 +39,6 @@
   return [file readDataToEndOfFile];
 }
 
-- (void)execute:(void (^)(NSData *output))completion {
-  if (self.name == nil) {
-    if (completion)
-      completion(nil);
-    return;
-  }
-
-  NSTask *task = [[NSTask alloc] init];
-  [task setLaunchPath:self.name];
-  [task setArguments:self.args];
-
-  NSPipe *pipe = [NSPipe pipe];
-  [task setStandardOutput:pipe];
-
-  NSFileHandle *file = [pipe fileHandleForReading];
-
-  // Use background reading
-  [[NSNotificationCenter defaultCenter]
-      addObserverForName:NSFileHandleReadToEndOfFileCompletionNotification
-                  object:file
-                   queue:[NSOperationQueue mainQueue]
-              usingBlock:^(NSNotification *_Nonnull note) {
-                NSData *outputData =
-                    note.userInfo[NSFileHandleNotificationDataItem];
-                if (completion) {
-                  completion(outputData);
-                }
-              }];
-
-  @try {
-    [task launch];
-    [file readToEndOfFileInBackgroundAndNotify];
-  } @catch (NSException *exception) {
-    NSLog(@"Command '%@' execute failed: %@", self, exception);
-    if (completion)
-      completion(nil);
-  }
-}
-
 - (NSString *)description {
   NSMutableArray *components = [NSMutableArray arrayWithArray:self.args];
   [components insertObject:self.name atIndex:0];

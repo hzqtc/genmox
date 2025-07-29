@@ -117,20 +117,19 @@
     return;
   }
   NSLog(@"[%@] Execute command: %@", self.name, [command description]);
-  [command execute:^(NSData *commandOutput) {
-    if (commandOutput) {
-      if ([self parseCommandOutputInJSON:commandOutput] != 0) {
-        NSLog(@"[%@] Command gives incorrect output. Stopping monitor.",
-              self.name);
-        [self stop];
-        return;
-      }
-    } else {
-      NSLog(@"[%@] Command execution failed. Stopping monitor.", self.name);
+  NSData *commandOutput = [command execute];
+  if (commandOutput) {
+    if ([self parseCommandOutputInJSON:commandOutput] != 0) {
+      NSLog(@"[%@] Command gives incorrect output. Stopping monitor.",
+            self.name);
       [self stop];
       return;
     }
-  }];
+  } else {
+    NSLog(@"[%@] Command execution failed. Stopping monitor.", self.name);
+    [self stop];
+    return;
+  }
 }
 
 - (int)parseCommandOutputInJSON:(NSData *)jsonData {
@@ -300,12 +299,11 @@
   NSNumber *key = [NSNumber numberWithUnsignedInt:[sender hash]];
   Command *menuCommand =
       [[Command alloc] initWithLaunchString:[menuCommandMap objectForKey:key]];
-  [menuCommand execute:^(NSData *outputData) {
-    if ([refreshingMenuItems containsObject:key]) {
-      NSLog(@"[%@] Refreshing after executing command", self.name);
-      [self monitorRoutine];
-    }
-  }];
+  [menuCommand execute];
+  if ([refreshingMenuItems containsObject:key]) {
+    NSLog(@"[%@] Refreshing after executing command", self.name);
+    [self monitorRoutine];
+  }
 }
 
 - (NSColor *)colorFromHexString:(NSString *)hexString {
