@@ -5,12 +5,16 @@
 # Get a free key on https://finnhub.io/
 API_KEY_FILE="$(dirname "$0")/.finnhub-key"
 if [ ! -f "$API_KEY_FILE" ]; then
-  echo "API key file '$API_KEY_FILE' not found."
+  echo '{"text": "API key file not found"}'
   exit 1
 fi
 API_KEY=$(<"$API_KEY_FILE")
 
-symbols=("GOOG" "AAPL" "META" "AMZN" "MSFT" "TSLA" "NVDA")
+symbols=("$@")
+if [ ${#symbols[@]} -eq 0 ]; then
+  echo '{"text": "No tickers specified"}'
+  exit 1
+fi
 
 # Get stock quote and format into a json string
 stock_quote() {
@@ -37,7 +41,7 @@ quote_color() {
   local abs_percent=$(echo "${percent#-}" | bc -l)
 
   # Default color when change is neutral (<1%)
-  if (( $(echo "$abs_percent < 1" | bc -l) )); then
+  if (($(echo "$abs_percent < 1" | bc -l))); then
     echo ""
     return
   fi
@@ -45,7 +49,7 @@ quote_color() {
   # Determine shade based on threshold
   local primary_shade
   local secondary_shade
-  if (( $(echo "$abs_percent < 4" | bc -l) )); then
+  if (($(echo "$abs_percent < 4" | bc -l))); then
     primary_shade="A7"
     secondary_shade="00"
   else
@@ -53,7 +57,7 @@ quote_color() {
     secondary_shade="10"
   fi
 
-  if (( $(echo "$percent < 0" | bc -l) )); then
+  if (($(echo "$percent < 0" | bc -l))); then
     echo "${primary_shade}${secondary_shade}${secondary_shade}"
   else
     echo "${secondary_shade}${primary_shade}${secondary_shade}"
@@ -104,4 +108,3 @@ jq -n \
   --argjson menus "$menu_items" \
   --arg text "$text" \
   '{"menus": $menus, "text": $text}'
-

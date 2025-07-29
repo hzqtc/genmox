@@ -4,13 +4,30 @@
 
 @synthesize name, args;
 
-- (id)initWithLaunchString:(NSString *)commandString {
-  NSLog(@"Init command: %@", commandString);
-  if ([self init]) {
-    NSArray *components = [commandString componentsSeparatedByString:@" "];
-    self.name = [components objectAtIndex:0];
-    NSRange argRange = {.location = 1, .length = [components count] - 1};
-    self.args = [components subarrayWithRange:argRange];
+- (id)initWithLaunchString:(NSString *)launchString {
+  NSArray<NSString *> *components =
+      [launchString componentsSeparatedByString:@" "];
+  if (components.count == 0) {
+    return nil;
+  }
+
+  NSString *command = components[0];
+  NSArray<NSString *> *arguments =
+      (components.count > 1)
+          ? [components subarrayWithRange:NSMakeRange(1, components.count - 1)]
+          : @[];
+
+  return [self initWithCommand:command arguments:arguments];
+}
+
+- (id)initWithCommand:(NSString *)command
+            arguments:(NSArray<NSString *> *)arguments {
+  self = [super init];
+  if (self) {
+    self.name = command;
+    self.args = arguments ?: @[];
+    NSLog(@"Init command: %@ %@", self.name,
+          [self.args componentsJoinedByString:@" "]);
   }
   return self;
 }
@@ -40,10 +57,8 @@
 }
 
 - (NSString *)description {
-  NSMutableArray *components = [NSMutableArray arrayWithArray:self.args];
-  [components insertObject:self.name atIndex:0];
-  NSString *desc = [components componentsJoinedByString:@" "];
-  return desc;
+  return [[@[ self.name ] arrayByAddingObjectsFromArray:self.args]
+      componentsJoinedByString:@" "];
 }
 
 @end

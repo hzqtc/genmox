@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 
-time_zones=("Asia/Shanghai" "America/New_York" "Europe/Zurich")
+time_zones=("$@")
+if [ ${#time_zones[@]} -eq 0 ]; then
+  echo '{"text": "No timezones specified"}'
+  exit 1
+fi
 
 get_time_in_zone() {
   local timezone=$1

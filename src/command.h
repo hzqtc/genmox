@@ -6,6 +6,8 @@
 @property(nonatomic) NSArray *args;
 
 - (id)initWithLaunchString:(NSString *)commandString;
+- (id)initWithCommand:(NSString *)command
+            arguments:(NSArray<NSString *> *)arguments;
 - (NSData *)execute;
 - (NSString *)description;
 

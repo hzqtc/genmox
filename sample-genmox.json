@@ -27,11 +27,13 @@
   {
     "name": "Stock prices",
     "command": "/path/to/monitors/stock-price/stock-price.sh",
+    "args": ["GOOG", "AAPL", "META", "MSFT", "AMZN", "NVDA", "TSLA"],
     "interval": 1800
   },
   {
     "name": "World clock",
     "command": "/path/to/monitors/world-clock/world-clock.sh",
+    "args": ["Asia/Shanghai", "America/New_York", "Europe/Zurich"],
     "interval": 30
   }
 ]

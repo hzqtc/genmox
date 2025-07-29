@@ -66,6 +66,7 @@
   if ([self init]) {
     NSString *nameStr = config[@"name"];
     NSString *commandStr = config[@"command"];
+    NSArray *args = config[@"args"];
     NSNumber *interval = config[@"interval"];
     NSLog(@"Initializing monitor with name %@, command %@ and interval %@",
           nameStr, commandStr, interval);
@@ -77,7 +78,8 @@
       return nil;
     }
     if (commandStr && [commandStr length] > 0) {
-      self.command = [[Command alloc] initWithLaunchString:commandStr];
+      self.command = [[Command alloc] initWithCommand:commandStr
+                                            arguments:args];
     } else {
       NSLog(@"[%@] Invalid command path: %@", name, commandStr);
       return nil;
