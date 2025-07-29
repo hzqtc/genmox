@@ -112,6 +112,10 @@
   [self monitorRoutine];
 }
 
+- (void)refresh {
+  [self monitorRoutine];
+}
+
 - (void)monitorRoutine {
   if (isMenuOpen && self.pauseWhenOpen) {
     return;
@@ -123,12 +127,10 @@
       NSLog(@"[%@] Command gives incorrect output. Stopping monitor.",
             self.name);
       [self stop];
-      return;
     }
   } else {
     NSLog(@"[%@] Command execution failed. Stopping monitor.", self.name);
     [self stop];
-    return;
   }
 }
 

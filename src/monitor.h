@@ -9,16 +9,11 @@
 @property(nonatomic) int interval;
 @property(nonatomic) bool pauseWhenOpen;
 
-- (id)init;
 - (id)initWithConfig:(NSDictionary *)config;
 
 - (void)start;
-- (void)monitorRoutine;
+- (void)refresh;
 - (void)stop;
-
-- (int)parseCommandOutputInJSON:(NSData *)jsonData;
-
-- (void)menuAction:(id)sender;
 
 @end
 
