@@ -1,0 +1,37 @@
+[
+  {
+    "name": "Homebrew status",
+    "command": "/path/to/monitors/brew-status/brew-status.sh",
+    "interval": 1800
+  },
+  {
+    "name": "Clipboard color strings",
+    "command": "/path/to/monitors/clipboard-color/clip_color.py",
+    "interval": 1
+  },
+  {
+    "name": "Git repos",
+    "command": "/path/to/monitors/git-repo/repo-status.sh",
+    "interval": 60
+  },
+  {
+    "name": "Now playing",
+    "command": "/path/to/monitors/now-playing/mpd-monitor.sh",
+    "interval": 1
+  },
+  {
+    "name": "Shipping status",
+    "command": "/path/to/monitors/shipping/shipping-status.sh",
+    "interval": 1800
+  },
+  {
+    "name": "Stock prices",
+    "command": "/path/to/monitors/stock-price/stock-price.sh",
+    "interval": 1800
+  },
+  {
+    "name": "World clock",
+    "command": "/path/to/monitors/world-clock/world-clock.sh",
+    "interval": 30
+  }
+]
