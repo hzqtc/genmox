@@ -45,7 +45,7 @@
     statusMenu.delegate = self;
     updateMenuItem =
         [[NSMenuItem alloc] initWithTitle:@"Refresh"
-                                   action:@selector(updateMenuAction:)
+                                   action:@selector(updateMonitorAction:)
                             keyEquivalent:@"r"];
     [updateMenuItem setTarget:self];
     quitMenuItem =
@@ -92,32 +92,39 @@
 
 - (void)start {
   NSLog(@"[%@] Starting monitor", self.name);
-  [[NSRunLoop mainRunLoop] addTimer:timer forMode:NSRunLoopCommonModes];
-  [self monitorRoutine];
+  [NSThread detachNewThreadSelector:@selector(monitorThreadMain)
+                           toTarget:self
+                         withObject:nil];
 }
 
-- (void)updateMenuAction:(id)sender {
+- (void)monitorThreadMain {
+  @autoreleasepool {
+    [[NSRunLoop currentRunLoop] addTimer:timer forMode:NSRunLoopCommonModes];
+    [self monitorRoutine];
+    [[NSRunLoop currentRunLoop] run];
+  }
+}
+
+- (void)updateMonitorAction:(id)sender {
   [self monitorRoutine];
 }
 
 - (void)monitorRoutine {
-  NSData *commandOutput;
-
   NSLog(@"[%@] Execute command: %@", self.name, [command description]);
-  commandOutput = [command execute];
-
-  if (commandOutput) {
-    if ([self parseCommandOutputInJSON:commandOutput] != 0) {
-      NSLog(@"[%@] Command gives incorrect output. Stopping monitor.",
-            self.name);
+  [command execute:^(NSData *commandOutput) {
+    if (commandOutput) {
+      if ([self parseCommandOutputInJSON:commandOutput] != 0) {
+        NSLog(@"[%@] Command gives incorrect output. Stopping monitor.",
+              self.name);
+        [self stop];
+        return;
+      }
+    } else {
+      NSLog(@"[%@] Command execution failed. Stopping monitor.", self.name);
       [self stop];
       return;
     }
-  } else {
-    NSLog(@"[%@] Command execution failed. Stopping monitor.", self.name);
-    [self stop];
-    return;
-  }
+  }];
 }
 
 - (int)parseCommandOutputInJSON:(NSData *)jsonData {
@@ -130,68 +137,66 @@
     return -1;
   }
 
-  NSString *title = [jsonObject objectForKey:@"text"];
-  if (title == nil) {
-    NSLog(@"[%@] text is missing", self.name);
-    return -1;
-  }
+  dispatch_async(dispatch_get_main_queue(), ^{
+    NSString *title = [jsonObject objectForKey:@"text"];
+    NSString *textColor = [jsonObject objectForKey:@"textcolor"];
+    if (textColor != nil) {
+      NSDictionary *attributes = @{
+        NSForegroundColorAttributeName : [self colorFromHexString:textColor],
+        NSFontAttributeName : [NSFont systemFontOfSize:[NSFont systemFontSize]]
+      };
+      NSAttributedString *attributedTitle =
+          [[NSAttributedString alloc] initWithString:title
+                                          attributes:attributes];
+      statusBarButton.attributedTitle = attributedTitle;
+    } else {
+      statusBarButton.title = title;
+    }
 
-  NSString *textColor = [jsonObject objectForKey:@"textcolor"];
-  if (textColor != nil) {
-    NSDictionary *attributes = @{
-      NSForegroundColorAttributeName : [self colorFromHexString:textColor],
-      NSFontAttributeName : [NSFont systemFontOfSize:[NSFont systemFontSize]]
-    };
-    NSAttributedString *attributedTitle =
-        [[NSAttributedString alloc] initWithString:title attributes:attributes];
-    statusBarButton.attributedTitle = attributedTitle;
-  } else {
-    statusBarButton.title = title;
-  }
+    NSString *imageSymbol = [jsonObject objectForKey:@"imagesymbol"];
+    NSString *imagePath = [jsonObject objectForKey:@"image"];
+    NSImage *image;
+    if (imageSymbol != nil) {
+      image = [NSImage imageWithSystemSymbolName:imageSymbol
+                        accessibilityDescription:@""];
+    } else if (imagePath != nil) {
+      image = [[NSImage alloc] initWithContentsOfFile:imagePath];
+    }
+    if (image != nil) {
+      image.template = YES;
+      statusBarButton.image = image;
+    }
 
-  NSString *imageSymbol = [jsonObject objectForKey:@"imagesymbol"];
-  NSString *imagePath = [jsonObject objectForKey:@"image"];
-  NSImage *image;
-  if (imageSymbol != nil) {
-    image = [NSImage imageWithSystemSymbolName:imageSymbol
-                      accessibilityDescription:@""];
-  } else if (imagePath != nil) {
-    image = [[NSImage alloc] initWithContentsOfFile:imagePath];
-  }
-  if (image != nil) {
-    image.template = YES;
-    statusBarButton.image = image;
-  }
+    statusBarButton.toolTip = [jsonObject objectForKey:@"tooltip"];
 
-  statusBarButton.toolTip = [jsonObject objectForKey:@"tooltip"];
+    [statusMenu removeAllItems];
+    [menuCommandMap removeAllObjects];
+    [refreshingMenuItems removeAllObjects];
+    NSArray *menuObjs = [jsonObject objectForKey:@"menus"];
+    NSArray<NSMenuItem *> *menuItems = [self getMenuItems:menuObjs];
+    for (NSMenuItem *item in menuItems) {
+      [statusMenu addItem:item];
+    }
 
-  [statusMenu removeAllItems];
-  [menuCommandMap removeAllObjects];
-  [refreshingMenuItems removeAllObjects];
-  NSArray *menuObjs = [jsonObject objectForKey:@"menus"];
-  NSArray<NSMenuItem *> *menuItems = [self getMenuItems:menuObjs];
-  for (NSMenuItem *item in menuItems) {
-    [statusMenu addItem:item];
-  }
+    if ([statusMenu numberOfItems] > 0) {
+      [statusMenu addItem:[NSMenuItem separatorItem]];
+    }
+    [statusMenu addItem:updateMenuItem];
+    [statusMenu addItem:quitMenuItem];
 
-  if ([statusMenu numberOfItems] > 0) {
-    [statusMenu addItem:[NSMenuItem separatorItem]];
-  }
-  [statusMenu addItem:updateMenuItem];
-  [statusMenu addItem:quitMenuItem];
-
-  NSString *menuOpen = [jsonObject objectForKey:@"menuopen"];
-  if (menuOpen != nil) {
-    menuOpenCommand = [[Command alloc] initWithLaunchString:menuOpen];
-  } else {
-    menuOpenCommand = nil;
-  }
-  NSString *menuClose = [jsonObject objectForKey:@"menuclose"];
-  if (menuClose != nil) {
-    menuCloseCommand = [[Command alloc] initWithLaunchString:menuClose];
-  } else {
-    menuCloseCommand = nil;
-  }
+    NSString *menuOpen = [jsonObject objectForKey:@"menuopen"];
+    if (menuOpen != nil) {
+      menuOpenCommand = [[Command alloc] initWithLaunchString:menuOpen];
+    } else {
+      menuOpenCommand = nil;
+    }
+    NSString *menuClose = [jsonObject objectForKey:@"menuclose"];
+    if (menuClose != nil) {
+      menuCloseCommand = [[Command alloc] initWithLaunchString:menuClose];
+    } else {
+      menuCloseCommand = nil;
+    }
+  });
 
   return 0;
 }
@@ -349,7 +354,9 @@
   NSLog(@"[%@] Stopping monitor", self.name);
   [timer invalidate];
   timer = nil;
-  [[NSStatusBar systemStatusBar] removeStatusItem:statusItem];
+  dispatch_async(dispatch_get_main_queue(), ^{
+    [[NSStatusBar systemStatusBar] removeStatusItem:statusItem];
+  });
 }
 
 - (void)quitMonitorAction:(id)sender {
