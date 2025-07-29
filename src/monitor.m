@@ -18,7 +18,7 @@
   Command *menuCloseCommand;
 }
 
-@synthesize command;
+@synthesize command, name;
 
 - (int)interval {
   return [timer timeInterval];
@@ -27,11 +27,11 @@
 - (void)setInterval:(int)checkInterval {
   [timer invalidate];
   timer = nil;
-  timer = [NSTimer scheduledTimerWithTimeInterval:checkInterval
-                                           target:self
-                                         selector:@selector(monitorRoutine)
-                                         userInfo:nil
-                                          repeats:YES];
+  timer = [NSTimer timerWithTimeInterval:checkInterval
+                                  target:self
+                                selector:@selector(monitorRoutine)
+                                userInfo:nil
+                                 repeats:YES];
 }
 
 - (id)init {
@@ -48,9 +48,11 @@
                                    action:@selector(updateMenuAction:)
                             keyEquivalent:@"r"];
     [updateMenuItem setTarget:self];
-    quitMenuItem = [[NSMenuItem alloc] initWithTitle:@"Quit"
-                                              action:@selector(terminate:)
-                                       keyEquivalent:@"q"];
+    quitMenuItem =
+        [[NSMenuItem alloc] initWithTitle:@"Quit"
+                                   action:@selector(quitMonitorAction:)
+                            keyEquivalent:@"q"];
+    [quitMenuItem setTarget:self];
 
     menuCommandMap = [NSMutableDictionary dictionaryWithCapacity:100];
     refreshingMenuItems = [NSMutableSet setWithCapacity:100];
@@ -58,15 +60,39 @@
   return self;
 }
 
-- (id)initWithCommand:(Command *)initCommand andInterval:(int)checkInterval {
+- (id)initWithConfig:(NSDictionary *)config {
   if ([self init]) {
-    self.command = initCommand;
-    self.interval = checkInterval;
+    NSString *nameStr = config[@"name"];
+    NSString *commandStr = config[@"command"];
+    NSNumber *interval = config[@"interval"];
+    NSLog(@"Initializing monitor with name %@, command %@ and interval %@",
+          nameStr, commandStr, interval);
+
+    if (nameStr && [nameStr length] > 0) {
+      self.name = nameStr;
+    } else {
+      NSLog(@"Invalid command name: %@", name);
+      return nil;
+    }
+    if (commandStr && [commandStr length] > 0) {
+      self.command = [[Command alloc] initWithLaunchString:commandStr];
+    } else {
+      NSLog(@"[%@] Invalid command path: %@", name, commandStr);
+      return nil;
+    }
+    if (interval) {
+      self.interval = [interval intValue];
+    } else {
+      NSLog(@"[%@] Invalid command interval: %@", name, interval);
+      return nil;
+    }
   }
   return self;
 }
 
 - (void)start {
+  NSLog(@"[%@] Starting monitor", self.name);
+  [[NSRunLoop mainRunLoop] addTimer:timer forMode:NSRunLoopCommonModes];
   [self monitorRoutine];
 }
 
@@ -77,21 +103,20 @@
 - (void)monitorRoutine {
   NSData *commandOutput;
 
-  if (command) {
-    NSLog(@"Execute command: %@", [command description]);
-    commandOutput = [command execute];
-  } else {
-    NSLog(@"No command specified.");
-    [NSApp terminate:self];
-  }
+  NSLog(@"[%@] Execute command: %@", self.name, [command description]);
+  commandOutput = [command execute];
 
   if (commandOutput) {
     if ([self parseCommandOutputInJSON:commandOutput] != 0) {
-      NSLog(@"Command gives incorrect output.");
-      [NSApp terminate:self];
+      NSLog(@"[%@] Command gives incorrect output. Stopping monitor.",
+            self.name);
+      [self stop];
+      return;
     }
   } else {
-    [NSApp terminate:self];
+    NSLog(@"[%@] Command execution failed. Stopping monitor.", self.name);
+    [self stop];
+    return;
   }
 }
 
@@ -101,13 +126,13 @@
                                                              options:0
                                                                error:&e];
   if (jsonObject == nil) {
-    NSLog(@"JSON parse error: %@", e);
+    NSLog(@"[%@] JSON parse error: %@", self.name, e);
     return -1;
   }
 
   NSString *title = [jsonObject objectForKey:@"text"];
   if (title == nil) {
-    NSLog(@"text is missing");
+    NSLog(@"[%@] text is missing", self.name);
     return -1;
   }
 
@@ -266,7 +291,7 @@
       [[Command alloc] initWithLaunchString:[menuCommandMap objectForKey:key]];
   [menuCommand execute:^(NSData *outputData) {
     if ([refreshingMenuItems containsObject:key]) {
-      NSLog(@"Refreshing after executing command");
+      NSLog(@"[%@] Refreshing after executing command", self.name);
       [self monitorRoutine];
     }
   }];
@@ -284,7 +309,7 @@
   if ([colorString length] == 0) {
     return [NSColor labelColor];
   } else if ([colorString length] != 6) {
-    NSLog(@"Invalid text color: %@", colorString);
+    NSLog(@"[%@] Invalid text color: %@", self.name, colorString);
     return [NSColor labelColor];
   }
 
@@ -308,16 +333,27 @@
 
 - (void)menuWillOpen:(NSMenu *)menu {
   if (menuOpenCommand != nil) {
-    NSLog(@"Executing menu open command");
+    NSLog(@"[%@] Executing menu open command", self.name);
     [menuOpenCommand execute];
   }
 }
 
 - (void)menuDidClose:(NSMenu *)menu {
   if (menuCloseCommand != nil) {
-    NSLog(@"Executing menu close command");
+    NSLog(@"[%@] Executing menu close command", self.name);
     [menuCloseCommand execute];
   }
+}
+
+- (void)stop {
+  NSLog(@"[%@] Stopping monitor", self.name);
+  [timer invalidate];
+  timer = nil;
+  [[NSStatusBar systemStatusBar] removeStatusItem:statusItem];
+}
+
+- (void)quitMonitorAction:(id)sender {
+  [self stop];
 }
 @end
 

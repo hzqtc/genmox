@@ -1,24 +1,12 @@
-#import "monitor.h"
+#import "AppDelegate.h"
 #import <Cocoa/Cocoa.h>
 
-int main() {
+int main(int argc, const char *argv[]) {
   @autoreleasepool {
-    [NSApplication sharedApplication];
-
-    NSArray *processArgs = [[NSProcessInfo processInfo] arguments];
-    if ([processArgs count] != 3) {
-      printf("Usage: %s [interval] '[command]'\n",
-             [[processArgs objectAtIndex:0] UTF8String]);
-      return 1;
-    }
-    Command *command =
-        [[Command alloc] initWithLaunchString:[processArgs objectAtIndex:2]];
-    Monitor *monitor = [[Monitor alloc]
-        initWithCommand:command
-            andInterval:[[processArgs objectAtIndex:1] intValue]];
-    [monitor start];
-
-    [NSApp run];
+    NSApplication *application = [NSApplication sharedApplication];
+    AppDelegate *appDelegate = [[AppDelegate alloc] init];
+    [application setDelegate:appDelegate];
+    [application run];
   }
   return 0;
 }
