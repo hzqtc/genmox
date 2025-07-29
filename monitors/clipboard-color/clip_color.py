@@ -163,7 +163,7 @@ def write_to_history(results: dict):
     )
 
     with open(history_file, "w") as f:
-        for color_str, hex_str in results.items():
+        for color_str, hex_str in reversed(list(results.items())):
             f.write(f"{color_str},{hex_str}\n")
 
 
