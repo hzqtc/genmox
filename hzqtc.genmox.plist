@@ -7,7 +7,7 @@
 
   <key>ProgramArguments</key>
   <array>
-    <string>/Users/hzqtc/Code/genmox/src/genmox</string>
+    <string>/path/to/genmox</string>
   </array>
 
   <key>RunAtLoad</key>

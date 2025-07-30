@@ -27,12 +27,11 @@ sleep 1
 rx_bytes2=$(netstat -ib | awk 'NR>1 && $1 != "lo0" {rx[$1]+=$7} END {total=0; for (i in rx) total+=rx[i]; print total}')
 tx_bytes2=$(netstat -ib | awk 'NR>1 && $1 != "lo0" {tx[$1]+=$10} END {total=0; for (i in tx) total+=tx[i]; print total}')
 
-rx_rate=$(( (rx_bytes2 - rx_bytes) / 1024 )) # in KB
-tx_rate=$(( (tx_bytes2 - tx_bytes) / 1024 )) # in KB
+rx_rate=$(((rx_bytes2 - rx_bytes) / 1024)) # in KB
+tx_rate=$(((tx_bytes2 - tx_bytes) / 1024)) # in KB
 
-summary="CPU: ${cpu_usage}%; Mem: ${used_mem_gb}/${total_mem_gb}G; Net: ${rx_rate}k↓/${tx_rate}k↑"
+summary="⚙️${cpu_usage}% 💾${used_mem_gb}/${total_mem_gb}G 🌐${rx_rate}k↓/${tx_rate}k↑"
 echo '
 {
   "text": "'$summary'"
 }'
-
