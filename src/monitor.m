@@ -18,6 +18,7 @@
   Command *menuCloseCommand;
   // Flag indicate whether the dropdown is currently open
   bool isMenuOpen;
+  NSRunLoop *monitorRunLoop;
 }
 
 @synthesize command, name, interval, pauseWhenOpen, isActive;
@@ -98,15 +99,45 @@
 
 - (void)monitorThreadMain {
   @autoreleasepool {
+    NSLog(@"[%@] Starting monitor thread", self.name);
+    monitorRunLoop = [NSRunLoop currentRunLoop];
     // Add timer to thread run loop, this does not fire the timer immediately
-    [[NSRunLoop currentRunLoop] addTimer:timer forMode:NSRunLoopCommonModes];
+    [monitorRunLoop addTimer:timer forMode:NSRunLoopCommonModes];
     [self monitorRoutine];
-    [[NSRunLoop currentRunLoop] run];
+    while (self.isActive &&
+           [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode
+                                    beforeDate:[NSDate distantFuture]])
+      ;
+    NSLog(@"[%@] Stopping monitor thread", self.name);
   }
+}
+
+- (void)stop {
+  NSLog(@"[%@] Stopping monitor", self.name);
+  if (monitorRunLoop) {
+    // Schedule this block on the monitor run loop to terminate it.
+    // Otherwise it may not wake up since timer is shut down below.
+    [monitorRunLoop performBlock:^{
+      self.isActive = false;
+    }];
+  } else {
+    self.isActive = false;
+  }
+  if (timer) {
+    [timer invalidate];
+    timer = nil;
+  }
+  dispatch_async(dispatch_get_main_queue(), ^{
+    [[NSStatusBar systemStatusBar] removeStatusItem:statusItem];
+  });
 }
 
 - (void)updateMonitorAction:(id)sender {
   [self monitorRoutine];
+}
+
+- (void)quitMonitorAction:(id)sender {
+  [self stop];
 }
 
 - (void)refresh {
@@ -353,20 +384,6 @@
     NSLog(@"[%@] Executing menu close command", self.name);
     [menuCloseCommand execute];
   }
-}
-
-- (void)stop {
-  NSLog(@"[%@] Stopping monitor", self.name);
-  self.isActive = false;
-  [timer invalidate];
-  timer = nil;
-  dispatch_async(dispatch_get_main_queue(), ^{
-    [[NSStatusBar systemStatusBar] removeStatusItem:statusItem];
-  });
-}
-
-- (void)quitMonitorAction:(id)sender {
-  [self stop];
 }
 @end
 
