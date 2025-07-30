@@ -20,21 +20,7 @@
   bool isMenuOpen;
 }
 
-@synthesize command, name, pauseWhenOpen;
-
-- (int)interval {
-  return [timer timeInterval];
-}
-
-- (void)setInterval:(int)checkInterval {
-  [timer invalidate];
-  timer = nil;
-  timer = [NSTimer timerWithTimeInterval:checkInterval
-                                  target:self
-                                selector:@selector(monitorRoutine)
-                                userInfo:nil
-                                 repeats:YES];
-}
+@synthesize command, name, interval, pauseWhenOpen, isActive;
 
 - (id)init {
   if (self = [super init]) {
@@ -67,9 +53,9 @@
     NSString *nameStr = config[@"name"];
     NSString *commandStr = config[@"command"];
     NSArray *args = config[@"args"];
-    NSNumber *interval = config[@"interval"];
+    NSNumber *intervalNum = config[@"interval"];
     NSLog(@"Initializing monitor with name %@, command %@ and interval %@",
-          nameStr, commandStr, interval);
+          nameStr, commandStr, intervalNum);
 
     if (nameStr && [nameStr length] > 0) {
       self.name = nameStr;
@@ -84,10 +70,10 @@
       NSLog(@"[%@] Invalid command path: %@", name, commandStr);
       return nil;
     }
-    if (interval) {
-      self.interval = [interval intValue];
+    if (intervalNum) {
+      self.interval = [intervalNum intValue];
     } else {
-      NSLog(@"[%@] Invalid command interval: %@", name, interval);
+      NSLog(@"[%@] Invalid command interval: %@", name, intervalNum);
       return nil;
     }
     self.pauseWhenOpen = [config[@"pause_when_open"] boolValue];
@@ -97,6 +83,14 @@
 
 - (void)start {
   NSLog(@"[%@] Starting monitor", self.name);
+  self.isActive = true;
+  if (timer == nil) {
+    timer = [NSTimer timerWithTimeInterval:self.interval
+                                    target:self
+                                  selector:@selector(monitorRoutine)
+                                  userInfo:nil
+                                   repeats:YES];
+  }
   [NSThread detachNewThreadSelector:@selector(monitorThreadMain)
                            toTarget:self
                          withObject:nil];
@@ -104,6 +98,7 @@
 
 - (void)monitorThreadMain {
   @autoreleasepool {
+    // Add timer to thread run loop, this does not fire the timer immediately
     [[NSRunLoop currentRunLoop] addTimer:timer forMode:NSRunLoopCommonModes];
     [self monitorRoutine];
     [[NSRunLoop currentRunLoop] run];
@@ -362,6 +357,7 @@
 
 - (void)stop {
   NSLog(@"[%@] Stopping monitor", self.name);
+  self.isActive = false;
   [timer invalidate];
   timer = nil;
   dispatch_async(dispatch_get_main_queue(), ^{

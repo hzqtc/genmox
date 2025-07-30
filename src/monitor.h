@@ -8,6 +8,7 @@
 @property(nonatomic) Command *command;
 @property(nonatomic) int interval;
 @property(nonatomic) bool pauseWhenOpen;
+@property(nonatomic) bool isActive;
 
 - (id)initWithConfig:(NSDictionary *)config;
 
