@@ -104,7 +104,14 @@ done
 menu_items=$(printf "%s\n" "${menu_item_json[@]}" | jq -s '.')
 
 text=$(echo "${menu_item_json[0]}" | jq -r '.text')
+change=$(echo "${menu_item_json[0]}" | jq -r '.badge')
+if [[ "$change" == +* ]]; then
+  symbol="chart.line.uptrend.xyaxis"
+else
+  symbol="chart.line.downtrend.xyaxis"
+fi
 jq -n \
   --argjson menus "$menu_items" \
   --arg text "$text" \
-  '{"menus": $menus, "text": $text}'
+  --arg symbol "$symbol" \
+  '{"menus": $menus, "text": $text, "imagesymbol": $symbol}'
