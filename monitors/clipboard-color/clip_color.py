@@ -25,9 +25,7 @@ class ColorExtractor(ABC):
 
 
 class HexColorExtractor(ColorExtractor):
-    _pattern = re.compile(
-        r"#[0-9a-fA-F]{8}|#[0-9a-fA-F]{6}|#[0-9a-fA-F]{4}|#[0-9a-fA-F]{3}|[0-9a-fA-F]{8}|[0-9a-fA-F]{6}"
-    )
+    _pattern = re.compile(r"#[0-9a-fA-F]{6}|#[0-9a-fA-F]{3}|[0-9a-fA-F]{6}")
 
     def extractColor(self, text: str) -> dict or None:
         results = {}
