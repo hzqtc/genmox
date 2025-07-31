@@ -35,8 +35,6 @@ class HexColorExtractor(ColorExtractor):
                 hex_str = color_string
                 if len(hex_str) == 4:  # #rgb
                     hex_str = f"#{hex_str[1] * 2}{hex_str[2] * 2}{hex_str[3] * 2}"
-                elif len(hex_str) == 5:  # #rgba
-                    hex_str = f"#{hex_str[1] * 2}{hex_str[2] * 2}{hex_str[3] * 2}{hex_str[4] * 2}"
                 results[color_string] = hex_str
             else:
                 results[color_string] = f"#{color_string}"
