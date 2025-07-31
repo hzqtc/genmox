@@ -373,16 +373,20 @@
 - (void)menuWillOpen:(NSMenu *)menu {
   isMenuOpen = true;
   if (menuOpenCommand != nil) {
-    NSLog(@"[%@] Executing menu open command", self.name);
+    NSLog(@"[%@] Executing menu open command: %@", self.name,
+          [menuOpenCommand description]);
     [menuOpenCommand execute];
+    [self refresh];
   }
 }
 
 - (void)menuDidClose:(NSMenu *)menu {
   isMenuOpen = false;
   if (menuCloseCommand != nil) {
-    NSLog(@"[%@] Executing menu close command", self.name);
+    NSLog(@"[%@] Executing menu close command: %@", self.name,
+          [menuCloseCommand description]);
     [menuCloseCommand execute];
+    [self refresh];
   }
 }
 @end
