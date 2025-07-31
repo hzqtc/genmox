@@ -144,7 +144,7 @@ def get_history() -> dict:
     if os.path.exists(history_file):
         with open(history_file, "r") as f:
             history_lines = f.readlines()
-        for line in reversed(history_lines):
+        for line in history_lines:
             parts = line.strip().split(",")
             if len(parts) != 2:
                 print(f"Error: malformatted histtory line {line}.", file=sys.stderr)
@@ -159,7 +159,7 @@ def write_to_history(results: dict):
     )
 
     with open(history_file, "w") as f:
-        for color_str, hex_str in reversed(list(results.items())):
+        for color_str, hex_str in results.items():
             f.write(f"{color_str},{hex_str}\n")
 
 
@@ -181,24 +181,20 @@ def format_results(results: dict) -> str:
 
 
 def main():
-    MAX_RESULT_NUM = 10
+    MAX_RESULT_NUM = 15
     results = {}
-
-    # Add entries from history
-    for color_str, hex_str in get_history().items():
-        if len(results) == MAX_RESULT_NUM:
-            break
-        results[color_str] = hex_str
 
     # Add results from the current clipboard content
     text = get_clipboard_text()
     if text:
         for color_str, hex_str in extract_color(text).items():
-            if color_str not in results:
-                results[color_str] = hex_str
+            results[color_str] = hex_str
 
-    # Resize results to max (keeping the last MAX_RESULT_NUM items)
-    results = dict(list(results.items())[-MAX_RESULT_NUM:])
+    # Fill remaining entries from history
+    for color_str, hex_str in get_history().items():
+        if len(results) == MAX_RESULT_NUM:
+            break
+        results[color_str] = hex_str
 
     # Write back to history
     write_to_history(results)
