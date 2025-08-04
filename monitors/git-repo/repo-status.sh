@@ -17,7 +17,6 @@ format_duration() {
   local days=$(((seconds % 604800) / 86400))
   local hours=$(((seconds % 86400) / 3600))
 
-
   pluralize() {
     local n=$1
     local word=$2
@@ -25,11 +24,11 @@ format_duration() {
   }
 
   local duration=""
-  if (( weeks > 0 )); then
+  if ((weeks > 0)); then
     duration="$(pluralize ${weeks} week)"
-  elif (( days > 0 )); then
+  elif ((days > 0)); then
     duration="$(pluralize ${days} day)"
-  elif (( hours > 0 )); then
+  elif ((hours > 0)); then
     duration="$(pluralize ${hours} hour)"
   fi
 
@@ -66,8 +65,8 @@ repo_status() {
   unstaged=$(git diff --shortstat 2>/dev/null)
   staged=$(git diff --shortstat --cached 2>/dev/null)
 
-  read -r ins1 del1 <<< "$(parse_diff "$unstaged")"
-  read -r ins2 del2 <<< "$(parse_diff "$staged")"
+  read -r ins1 del1 <<<"$(parse_diff "$unstaged")"
+  read -r ins2 del2 <<<"$(parse_diff "$staged")"
 
   insertions=$((ins1 + ins2))
   deletions=$((del1 + del2))
@@ -77,7 +76,7 @@ repo_status() {
   remote_branch=$(git rev-parse --abbrev-ref "$local_branch@{u}" 2>/dev/null)
   if [[ -n "$remote_branch" ]]; then
     git remote update -p &>/dev/null
-    read -r ahead behind <<< "$(git rev-list --left-right --count "$local_branch...$remote_branch" 2>/dev/null)"
+    read -r ahead behind <<<"$(git rev-list --left-right --count "$local_branch...$remote_branch" 2>/dev/null)"
     ahead=${ahead:-0}
     behind=${behind:-0}
   fi
@@ -95,26 +94,31 @@ repo_status() {
   # --- Code stats ---
   tokei_json=$($tokei . --output json)
   # Primary language is the one with most lines of code
-  primary_lang=$(echo "$tokei_json" \
-    | jq -r 'del(.Total) | to_entries | map(select(.value.code > 0)) | if length == 0 then "" else max_by(.value.code).key end')
+  primary_lang=$(echo "$tokei_json" |
+    jq -r 'del(.Total) | to_entries | map(select(.value.code > 0)) | if length == 0 then "" else max_by(.value.code).key end')
 
   # --- Calculate output values---
   local badge=""
   local text=""
   local subtext=""
   local click=""
+  local color=""
 
   # text shows the sync status of remote branch
-  if (( insertions > 0 || deletions > 0 )); then
+  if ((insertions > 0 || deletions > 0)); then
     text="$name: Uncommitted (+$insertions / -$deletions)"
+    color="#FF9E6D"
   elif [[ -n "$remote_branch" ]]; then
-    if (( ahead > 0 || behind > 0 )); then
-      text="$name: Unsynced ($ahead ahead / $behind behind)"
+    if ((ahead > 0 || behind > 0)); then
+      text="$name: Out of sync ($ahead ahead / $behind behind)"
+      color="#E9C7FF"
     else
       text="$name: Up to date"
+      color="#66CC99"
     fi
   else
     text="$name: No remote repo set"
+    color="#909090"
   fi
 
   # subtext shows commit stats
@@ -149,8 +153,9 @@ repo_status() {
     --arg click "$click" \
     --arg badge "$badge" \
     --arg subtext "$subtext" \
+    --arg color "$color" \
     --argjson last_commit "${last_commit_unix:-0}" \
-    '{text: $text, click: $click, badge: $badge, subtext: $subtext, last_commit: $last_commit}'
+    '{text: $text, click: $click, badge: $badge, subtext: $subtext, imagecolor: $color, last_commit: $last_commit}'
 }
 
 export -f repo_status
@@ -158,9 +163,9 @@ export -f format_duration
 
 # --- Find Git directories and process in parallel ---
 DIR="/Users/hzqtc/Code"
-menu_items=$(find "$DIR" -mindepth 1 -maxdepth 1 -type d -exec test -d '{}/.git' \; -print \
-  | $parallel repo_status \
-  | jq -s 'sort_by(-.last_commit)')
+menu_items=$(find "$DIR" -mindepth 1 -maxdepth 1 -type d -exec test -d '{}/.git' \; -print |
+  $parallel repo_status |
+  jq -s 'sort_by(-.last_commit)')
 
 all_up_to_date=$(echo "$menu_items" | jq 'all(.[]; (.text | test("Up to date|No remote repo set")))')
 if [[ "$all_up_to_date" == "true" ]]; then
