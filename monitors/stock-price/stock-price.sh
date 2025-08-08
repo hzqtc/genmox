@@ -42,7 +42,7 @@ quote_color() {
 
   # Default color when change is neutral (<1%)
   if (($(echo "$abs_percent < 1" | bc -l))); then
-    echo ""
+    echo "A9A9A9"
     return
   fi
 
@@ -50,11 +50,11 @@ quote_color() {
   local primary_shade
   local secondary_shade
   if (($(echo "$abs_percent < 4" | bc -l))); then
-    primary_shade="A7"
-    secondary_shade="00"
+    primary_shade="82"
+    secondary_shade="3C"
   else
-    primary_shade="BD"
-    secondary_shade="10"
+    primary_shade="B8"
+    secondary_shade="51"
   fi
 
   if (($(echo "$percent < 0" | bc -l))); then
@@ -82,8 +82,8 @@ quote_menu_item() {
     --arg click "$click" \
     --arg text "$quote" \
     --arg badge "$badge" \
-    --arg textcolor "$color" \
-    '{click: $click, text: $text, badge: $badge, textcolor: $textcolor}')
+    --arg color "$color" \
+    '{click: $click, text: $text, badge: $badge, imagecolor: $color}')
 }
 
 # Export for parallel to use
