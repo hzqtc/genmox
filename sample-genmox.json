@@ -12,6 +12,7 @@
   {
     "name": "Git repos",
     "command": "/path/to/monitors/git-repo/repo-status.sh",
+    "args": ["/Users/yourname/path/to/repos"],
     "interval": 60
   },
   {

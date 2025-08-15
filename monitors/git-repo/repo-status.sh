@@ -162,7 +162,11 @@ export -f repo_status
 export -f format_duration
 
 # --- Find Git directories and process in parallel ---
-DIR="/Users/hzqtc/Code"
+if [ -z "$1" ]; then
+  echo "Usage: repo-statis.sh /path/to/repos/parent/dir"
+  exit 1
+fi
+DIR="$1"
 menu_items=$(find "$DIR" -mindepth 1 -maxdepth 1 -type d -exec test -d '{}/.git' \; -print |
   $parallel repo_status |
   jq -s 'sort_by(-.last_commit)')
