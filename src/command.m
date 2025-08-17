@@ -41,10 +41,11 @@
   [task setLaunchPath:name];
   [task setArguments:args];
 
-  NSPipe *pipe = [NSPipe pipe];
-  [task setStandardOutput:pipe];
+  NSPipe *outputPipe = [NSPipe pipe];
+  [task setStandardOutput:outputPipe];
 
-  NSFileHandle *file = [pipe fileHandleForReading];
+  NSPipe *errorPipe = [NSPipe pipe];
+  [task setStandardError:errorPipe];
 
   @try {
     [task launch];
@@ -53,7 +54,16 @@
     return nil;
   }
 
-  return [file readDataToEndOfFile];
+  NSData *outputData = [[outputPipe fileHandleForReading] readDataToEndOfFile];
+  NSData *errorData = [[errorPipe fileHandleForReading] readDataToEndOfFile];
+
+  if ([errorData length] > 0) {
+    NSString *errorString =
+        [[NSString alloc] initWithData:errorData encoding:NSUTF8StringEncoding];
+    NSLog(@"Command '%@' stderr: %@", self, errorString);
+  }
+
+  return outputData;
 }
 
 - (NSString *)description {
