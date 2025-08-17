@@ -20,6 +20,10 @@ $(TARGET): $(OBJ)
 %.o: %.m
 	$(CC) $(CFLAGS) -c $< -o $@
 
+install: release
+	mv $(TARGET) ~/.local/bin
+	rm -f *.o
+
 .PHONY: clean
 clean:
-	-rm -f *.o $(TARGET)
+	rm -f *.o $(TARGET)
