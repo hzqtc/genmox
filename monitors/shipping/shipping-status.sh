@@ -32,7 +32,7 @@ new_snapshot=$(echo "$response" | jq -r '
   status: "\(.tracking_status)",
   location: "\(.tracking_location)"
 }] | tojson')
-echo "$new_snapshot" > "$SNAPSHOT_FILE.tmp"
+echo "$new_snapshot" >"$SNAPSHOT_FILE.tmp"
 
 if [[ "$new_snapshot" != "$prev_snapshot" ]]; then
   # Show a filled icon when there is update
@@ -97,7 +97,7 @@ fi
 
 top_menu_items+=', {"text": "-"}'
 if [[ "$delivered_menu_items" == "[]" && "$undelivered_menu_items" == "[]" ]]; then
-  top_menu_items+=', {"text": "No pakcages"}'
+  top_menu_items+=', {"text": "No packages"}'
 fi
 menu_items=$(jq -s 'add' \
   <(echo "[$top_menu_items]") \
