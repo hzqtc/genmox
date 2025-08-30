@@ -96,9 +96,10 @@ def find_solar_term(year) -> dict:
 def next_solar_term() -> str:
     now = datetime.now()
     solar_terms = find_solar_term(now.year)
-    for term, dt in solar_terms.items():
+    next_year_solar_terms = find_solar_term(now.year + 1)
+    for term, dt in {**solar_terms, **next_year_solar_terms}.items():
         if dt == now:
             return f"今天是：{term}"
         elif dt > now:
-            return f"下一个节气是：{dt.month}/{dt.day} {term}"
-    return ""
+            return f"下一个节气是：{dt.month}月{dt.day}日 {term}"
+    raise RuntimeError(f"Expected: no next solar term found from {now}")

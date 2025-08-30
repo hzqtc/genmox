@@ -113,7 +113,14 @@ def next_festival(lunar_date: ZhDate) -> str:
                     format_lunar_day(day),
                     LUNAR_FESTIVALS[month][day],
                 )
-    return ""
+    # Return the first festival of next year
+    first_month = next(iter(LUNAR_FESTIVALS))
+    first_day = next(iter(LUNAR_FESTIVALS[first_month]))
+    return "下一个节日是：{}月{} {}".format(
+        format_lunar_month(first_month),
+        format_lunar_day(first_day),
+        LUNAR_FESTIVALS[first_month][first_day],
+    )
 
 
 if __name__ == "__main__":
