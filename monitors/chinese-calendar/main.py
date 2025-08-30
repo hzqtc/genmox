@@ -3,6 +3,8 @@ from datetime import datetime
 
 from zhdate import ZhDate  # type: ignore
 
+import solar_terms
+
 LUNAR_FESTIVALS = {
     1: {
         1: "春节",
@@ -44,7 +46,9 @@ def main():
             {
                 "text": "{}年 {}月{}".format(lunar_year, lunar_month, lunar_day),
                 "badge": "{}年".format(zodiac),
-                "subtext": next_festival(lunar_date),
+                "subtext": "{}\n{}".format(
+                    next_festival(lunar_date), solar_terms.next_solar_term()
+                ),
                 "click": "/usr/bin/open https://zh.wikipedia.org/wiki/{}月{}".format(
                     lunar_month, lunar_day
                 ),
