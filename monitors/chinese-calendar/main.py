@@ -31,32 +31,7 @@ ZH_NUMS = "〇一二三四五六七八九十"
 
 ZODIACS = "鼠牛虎兔龙蛇马羊猴鸡狗猪"
 
-ZH_HOURS = {
-    23: "子",
-    0: "子",
-    1: "丑",
-    2: "丑",
-    3: "寅",
-    4: "寅",
-    5: "卯",
-    6: "卯",
-    7: "辰",
-    8: "辰",
-    9: "巳",
-    10: "巳",
-    11: "午",
-    12: "午",
-    13: "未",
-    14: "未",
-    15: "申",
-    16: "申",
-    17: "酉",
-    18: "酉",
-    19: "戌",
-    20: "戌",
-    21: "亥",
-    22: "亥",
-}
+ZH_HOURS = "子丑丑寅寅卯卯辰辰巳巳午午未未申申酉酉戌戌亥亥子"
 
 
 def main():
@@ -172,11 +147,7 @@ def chinese_time(dt: datetime) -> str:
     # A Chinese hour is 2 hours
     if chinese_hour == ZH_HOURS[(dt.hour - 1) % 24]:
         minute_passed += 60
-
-    quarters = minute_passed // 15
-    if minute_passed % 15 > 0:
-        quarters += 1
-
+    quarters = minute_passed // 15 + 1
     return f"{chinese_hour}时{ZH_NUMS[quarters]}刻"
 
 
