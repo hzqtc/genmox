@@ -30,6 +30,7 @@ LUNAR_FESTIVALS = {
 ZH_NUMS = "〇一二三四五六七八九十"
 
 ZODIACS = "鼠牛虎兔龙蛇马羊猴鸡狗猪"
+ZODIAC_EMOJIS = "🐭🐮🐯🐰🐉🐍🐴🐑🐵🐔🐶🐷"
 
 ZH_HOURS = "子丑丑寅寅卯卯辰辰巳巳午午未未申申酉酉戌戌亥亥子"
 
@@ -43,6 +44,7 @@ def main():
     lunar_month = format_lunar_month(lunar_date.lunar_month, lunar_date.leap_month)
     lunar_day = format_lunar_day(lunar_date.lunar_day)
     zodiac = ZODIACS[(lunar_date.lunar_year - 1900) % 12]
+    zodiac_emoji = ZODIAC_EMOJIS[(lunar_date.lunar_year - 1900) % 12]
 
     festival_date, festival = next_festival(lunar_date)
     festival_month = format_lunar_month(
@@ -79,7 +81,7 @@ def main():
         "menus": [
             {
                 "text": f"今天是：{lunar_year}年 {lunar_month}月{lunar_day}",
-                "badge": "{}年".format(zodiac),
+                "badge": f"{zodiac_emoji} {zodiac}年",
                 "subtext": chinese_time(now),
                 "click": f"/usr/bin/open https://zh.wikipedia.org/wiki/{lunar_month}月{lunar_day}",
             },
