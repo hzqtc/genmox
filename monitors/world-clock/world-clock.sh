@@ -81,7 +81,7 @@ menu_item_for_zone() {
 
   echo '
     {
-        "click": "open https://time.is/'$timezone'",
+        "click": "/usr/bin/open https://time.is/'${city// /_}'",
         "text": "'$time' '$city'",
         "subtext": "Sun: ↑'$sunrise_fmt' ↓'$sunset_fmt' ('$hours'h'$minutes'm)",
         "badge": "'$badge'",
