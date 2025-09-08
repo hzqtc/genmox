@@ -58,6 +58,7 @@ menu_item_for_zone() {
   sun_response=$(curl -s "https://api.sunrisesunset.io/json?lat=$lat&lng=$lng")
   sunrise=$(echo $sun_response | jq -r '.results.sunrise')
   sunset=$(echo $sun_response | jq -r '.results.sunset')
+  utc_offset=$(echo $sun_response | jq -r '.results.utc_offset')
 
   sunrise_fmt=$(format_time "$sunrise")
   sunset_fmt=$(format_time "$sunset")
@@ -65,25 +66,38 @@ menu_item_for_zone() {
   # Convert to seconds since epoch
   sunrise_sec=$(to_epoch "$timezone" "$sunrise")
   sunset_sec=$(to_epoch "$timezone" "$sunset")
-  # Duration in seconds
-  diff=$((sunset_sec - sunrise_sec))
-  hours=$((diff / 3600))
-  minutes=$(((diff % 3600) / 60))
+  # Sunlight duration in seconds
+  sunlight_secs=$((sunset_sec - sunrise_sec))
+  sunlight_hours=$((sunlight_secs / 3600))
+  sunlight_mins=$(((sunlight_secs % 3600) / 60))
+  subtext="Sun: ↑$sunrise_fmt ↓$sunset_fmt (${sunlight_hours}h${sunlight_mins}m)"
+
+  utc_offset_hours=$((utc_offset / 60))
+  utc_offset_mins=$((utc_offset % 60))
+  badge="${utc_offset_hours}h"
+  if ((utc_offset < 0)); then
+    badge="${utc_offset_hours}h"
+  else
+    badge="+${utc_offset_hours}h"
+  fi
+  if ((utc_offset_mins > 0)); then
+    badge+="${utc_offset_mins}m"
+  fi
 
   now_sec=$(now_epoch "$timezone")
   if ((now_sec >= sunrise_sec && now_sec <= sunset_sec)); then
     daynight="day"
-    badge="☀️ $date"
+    badge+=" ☀️ $date"
   else
     daynight="night"
-    badge="🌙 $date"
+    badge+=" 🌙 $date"
   fi
 
   echo '
     {
         "click": "/usr/bin/open https://time.is/'${city// /_}'",
         "text": "'$time' '$city'",
-        "subtext": "Sun: ↑'$sunrise_fmt' ↓'$sunset_fmt' ('$hours'h'$minutes'm)",
+        "subtext": "'$subtext'",
         "badge": "'$badge'",
         "daynight": "'$daynight'"
     }'
