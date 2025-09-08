@@ -25,7 +25,7 @@ if test ! -x "$parallel"; then
 fi
 
 # Update brew and check for outdated packages
-$brew update > /dev/null 2>&1
+$brew update >/dev/null 2>&1
 pkgs=$($brew outdated --quiet)
 
 if [[ -z "$pkgs" ]]; then
@@ -48,10 +48,14 @@ get_pkg_menuitem() {
     local url=$(echo $formulae | jq -r '.homepage')
     local current_version=$(echo $formulae | jq -r '.installed[0].version')
     local new_version=$(echo $formulae | jq -r '.versions.stable')
+    local new_revision=$(echo $formulae | jq -r '.revision')
+    if (("$new_revision" > 0)); then
+      new_version+="_$new_revision"
+    fi
   elif [[ $cask != 'null' ]]; then
     local desc=$(echo $cask | jq -r '.desc')
     local url=$(echo $cask | jq -r '.homepage')
-    local current_version=$(echo $cask| jq -r '.installed')
+    local current_version=$(echo $cask | jq -r '.installed')
     local new_version=$(echo $cask | jq -r '.version')
   fi
   echo '{
@@ -89,6 +93,5 @@ if test -x "$notifier"; then
     -title "Newer formula available" \
     -message "$pkgs" \
     -sound Glass \
-    -sender com.apple.Terminal > /dev/null 2>&1
+    -sender com.apple.Terminal >/dev/null 2>&1
 fi
-
