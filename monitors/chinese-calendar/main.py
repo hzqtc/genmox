@@ -43,6 +43,8 @@ def main():
     lunar_year = format_lunar_year(lunar_date.lunar_year)
     lunar_month = format_lunar_month(lunar_date.lunar_month, lunar_date.leap_month)
     lunar_day = format_lunar_day(lunar_date.lunar_day)
+    summary = f"{lunar_month}月{lunar_day}"
+
     zodiac = ZODIACS[(lunar_date.lunar_year - 1900) % 12]
     zodiac_emoji = ZODIAC_EMOJIS[(lunar_date.lunar_year - 1900) % 12]
 
@@ -57,11 +59,12 @@ def main():
     festival_subtext = (
         f"{festival_date - lunar_date}天后" if festival_date - lunar_date > 0 else ""
     )
+    if festival_date == lunar_date:
+        summary += f" {festival}"
 
     solar_term_date, solar_term = solar_terms.next_solar_term(today)
-    solar_term_lunar_date = ZhDate.from_datetime(
-        solar_term_date.replace(hour=0, minute=0, second=0, microsecond=0)
-    )
+    solar_term_date = solar_term_date.replace(hour=0, minute=0, second=0, microsecond=0)
+    solar_term_lunar_date = ZhDate.from_datetime(solar_term_date)
     solar_term_month = format_lunar_month(
         solar_term_lunar_date.lunar_month, solar_term_lunar_date.leap_month
     )
@@ -74,9 +77,11 @@ def main():
         if solar_term_lunar_date - lunar_date > 0
         else ""
     )
+    if solar_term_date == today:
+        summary += f" {solar_term}"
 
     msg = {
-        "text": "{}月{}".format(lunar_month, lunar_day),
+        "text": summary,
         "imagesymbol": "calendar",
         "menus": [
             {
