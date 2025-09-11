@@ -23,45 +23,14 @@ stock_quote() {
   local url="https://finnhub.io/api/v1/quote?symbol=${symbol}"
   local json=$(curl -s -H "X-Finnhub-Token: $API_KEY" "$url")
 
-  price=$(echo "$json" | jq -r '.c')
-  change=$(echo "$json" | jq -r '.d')
-  change_percent=$(echo "$json" | jq -r '.dp')
-
-  echo $(jq -n \
+  jq -n -c \
     --arg symbol "$symbol" \
-    --arg price "$price" \
-    --arg change "$change" \
-    --arg change_percent "$change_percent" \
-    '{symbol: $symbol, price: $price, change: $change, change_percent: $change_percent}')
-}
-
-quote_color() {
-  # Percent from -100 to 100
-  local percent="$1"
-  local abs_percent=$(echo "${percent#-}" | bc -l)
-
-  # Default color when change is neutral (<1%)
-  if (($(echo "$abs_percent < 1" | bc -l))); then
-    echo "A9A9A9"
-    return
-  fi
-
-  # Determine shade based on threshold
-  local primary_shade
-  local secondary_shade
-  if (($(echo "$abs_percent < 4" | bc -l))); then
-    primary_shade="82"
-    secondary_shade="3C"
-  else
-    primary_shade="B8"
-    secondary_shade="51"
-  fi
-
-  if (($(echo "$percent < 0" | bc -l))); then
-    echo "${primary_shade}${secondary_shade}${secondary_shade}"
-  else
-    echo "${secondary_shade}${primary_shade}${secondary_shade}"
-  fi
+    --arg price "$(echo "$json" | jq -r '.c')" \
+    --arg change "$(echo "$json" | jq -r '.d')" \
+    --arg change_percent "$(echo "$json" | jq -r '.dp')" \
+    --arg open "$(echo "$json" | jq -r '.o')" \
+    --arg prev_close "$(echo "$json" | jq -r '.pc')" \
+    '{symbol: $symbol, price: $price, change: $change, change_percent: $change_percent, open: $open, prev_close: $prev_close}'
 }
 
 # Format quote json into a menu item
@@ -72,18 +41,27 @@ quote_menu_item() {
   local price=$(echo "$json" | jq -r '.price')
   local change=$(echo "$json" | jq -r '.change')
   local change_percent=$(echo "$json" | jq -r '.change_percent')
+  local open=$(echo "$json" | jq -r '.open')
+  local prev_close=$(echo "$json" | jq -r '.prev_close')
 
   local quote=$(printf "%s \$%.2f\n" "$symbol" "$price")
-  local badge=$(printf "%+.2f%%\n" "$change_percent")
-  local color=$(quote_color "$change_percent")
+  local subtext=$(printf "Previous close: $%.2f Open: $%.2f" "$open" "$prev_close")
+  local badge=$(printf "%+.2f (%+.2f%%)\n" "$change" "$change_percent")
+  local color
+  if [[ "$change" == -* ]]; then
+    color="FF9E6D"
+  else
+    color="66CC99"
+  fi
   local click="/usr/bin/open https://www.google.com/search?q=${symbol}+stock"
 
-  echo $(jq -n \
+  jq -n -c \
     --arg click "$click" \
     --arg text "$quote" \
+    --arg subtext "$subtext" \
     --arg badge "$badge" \
     --arg color "$color" \
-    '{click: $click, text: $text, badge: $badge, imagecolor: $color}')
+    '{click: $click, text: $text, subtext: $subtext, badge: $badge, imagecolor: $color}'
 }
 
 # Export for parallel to use
