@@ -128,7 +128,10 @@
     timer = nil;
   }
   dispatch_async(dispatch_get_main_queue(), ^{
-    [[NSStatusBar systemStatusBar] removeStatusItem:statusItem];
+    if (statusItem) {
+      [[NSStatusBar systemStatusBar] removeStatusItem:statusItem];
+      statusItem = nil;
+    }
   });
 }
 
@@ -152,13 +155,10 @@
   NSData *commandOutput = [command execute];
   if (commandOutput) {
     if ([self parseCommandOutputInJSON:commandOutput] != 0) {
-      NSLog(@"[%@] Command gives incorrect output. Stopping monitor.",
-            self.name);
-      [self stop];
+      NSLog(@"[%@] Command gives incorrect output.", self.name);
     }
   } else {
-    NSLog(@"[%@] Command execution failed. Stopping monitor.", self.name);
-    [self stop];
+    NSLog(@"[%@] Command execution failed.", self.name);
   }
 }
 

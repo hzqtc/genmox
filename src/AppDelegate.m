@@ -6,7 +6,6 @@
 @implementation AppDelegate {
   NSString *configPath;
   NSMutableArray *monitors;
-  NSTimer *monitorCheckTimer;
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)notification {
@@ -71,13 +70,6 @@
   }
 
   [self startMonitors:monitorConfigs];
-
-  monitorCheckTimer =
-      [NSTimer scheduledTimerWithTimeInterval:10.0
-                                       target:self
-                                     selector:@selector(checkMonitors)
-                                     userInfo:nil
-                                      repeats:YES];
 }
 
 - (void)startMonitors:(NSArray *)monitorConfigs {
@@ -86,48 +78,6 @@
     if (monitor) {
       [monitors addObject:monitor];
       [monitor start];
-    }
-  }
-}
-
-- (void)checkMonitors {
-  NSLog(@"Checking monitors...");
-
-  NSMutableArray *monitorsToRestart = [[NSMutableArray alloc] init];
-  for (Monitor *monitor in monitors) {
-    if (!monitor.isActive) {
-      NSLog(@"Monitor '%@' is inactive. Preparing to restart.", monitor.name);
-      [monitorsToRestart addObject:monitor];
-    }
-  }
-
-  if (monitorsToRestart.count == 0) {
-    return;
-  }
-
-  NSError *error = nil;
-  NSArray *monitorConfigs = [ConfigLoader loadConfigFromFile:configPath
-                                                       error:&error];
-  if (!monitorConfigs) {
-    NSLog(@"Error loading monitor configurations: %@", error);
-    [NSApp terminate:nil];
-    return;
-  }
-
-  for (Monitor *monitor in monitorsToRestart) {
-    // Remove the inactive monitor from the active list
-    [monitors removeObject:monitor];
-
-    // Find its original config and try to restart
-    for (NSDictionary *config in monitorConfigs) {
-      if ([config[@"name"] isEqualToString:monitor.name]) {
-        NSLog(@"Attempting to restart monitor '%@'.", monitor.name);
-        Monitor *newMonitor = [[Monitor alloc] initWithConfig:config];
-        if (newMonitor) {
-          [monitors addObject:newMonitor];
-          [newMonitor start];
-        }
-      }
     }
   }
 }
