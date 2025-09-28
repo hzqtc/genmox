@@ -6,8 +6,6 @@
   NSStatusItem *statusItem;
   NSStatusBarButton *statusBarButton;
   NSMenu *statusMenu;
-  NSMenuItem *updateMenuItem;
-  NSMenuItem *quitMenuItem;
   // A map from menu item hash to command
   NSMutableDictionary *menuCommandMap;
   // A set of menu items that would trigger a refresh after executing
@@ -32,16 +30,6 @@
     statusMenu = [NSMenu new];
     statusItem.menu = statusMenu;
     statusMenu.delegate = self;
-    updateMenuItem =
-        [[NSMenuItem alloc] initWithTitle:@"Refresh"
-                                   action:@selector(updateMonitorAction:)
-                            keyEquivalent:@"r"];
-    [updateMenuItem setTarget:self];
-    quitMenuItem =
-        [[NSMenuItem alloc] initWithTitle:@"Quit"
-                                   action:@selector(quitMonitorAction:)
-                            keyEquivalent:@"q"];
-    [quitMenuItem setTarget:self];
 
     menuCommandMap = [NSMutableDictionary dictionaryWithCapacity:100];
     refreshingMenuItems = [NSMutableSet setWithCapacity:100];
@@ -216,6 +204,16 @@
     if ([statusMenu numberOfItems] > 0) {
       [statusMenu addItem:[NSMenuItem separatorItem]];
     }
+    NSMenuItem *updateMenuItem =
+        [[NSMenuItem alloc] initWithTitle:@"Refresh"
+                                   action:@selector(updateMonitorAction:)
+                            keyEquivalent:@"r"];
+    [updateMenuItem setTarget:self];
+    NSMenuItem *quitMenuItem =
+        [[NSMenuItem alloc] initWithTitle:@"Quit"
+                                   action:@selector(quitMonitorAction:)
+                            keyEquivalent:@"q"];
+    [quitMenuItem setTarget:self];
     [statusMenu addItem:updateMenuItem];
     [statusMenu addItem:quitMenuItem];
 
