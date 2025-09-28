@@ -47,15 +47,33 @@
   NSPipe *errorPipe = [NSPipe pipe];
   [task setStandardError:errorPipe];
 
-  @try {
-    [task launch];
-  } @catch (NSException *exception) {
-    NSLog(@"Command '%@' execute failed: %@", self, exception);
+  NSFileHandle *outputReadHandle = [outputPipe fileHandleForReading];
+  NSFileHandle *errorReadHandle = [errorPipe fileHandleForReading];
+  NSFileHandle *outputWriteHandle = [outputPipe fileHandleForWriting];
+  NSFileHandle *errorWriteHandle = [errorPipe fileHandleForWriting];
+
+  NSError *error = nil;
+  if (![task launchAndReturnError:&error]) {
+    NSLog(@"Command '%@' execute failed: %@", self, error);
+    [outputReadHandle closeFile];
+    [errorReadHandle closeFile];
+    [outputWriteHandle closeFile];
+    [errorWriteHandle closeFile];
     return nil;
   }
 
-  NSData *outputData = [[outputPipe fileHandleForReading] readDataToEndOfFile];
-  NSData *errorData = [[errorPipe fileHandleForReading] readDataToEndOfFile];
+  // Close the write ends of the pipes in the parent process. This is crucial.
+  // If we don't, readDataToEndOfFile will block forever because the pipe
+  // will still have one writer open (the parent process itself).
+  [outputWriteHandle closeFile];
+  [errorWriteHandle closeFile];
+
+  NSData *outputData = [outputReadHandle readDataToEndOfFile];
+  NSData *errorData = [errorReadHandle readDataToEndOfFile];
+
+  // Explicitly close the read handles to avoid file descriptor leaks.
+  [outputReadHandle closeFile];
+  [errorReadHandle closeFile];
 
   if ([errorData length] > 0) {
     NSString *errorString =
