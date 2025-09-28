@@ -41,6 +41,10 @@
   [task setLaunchPath:name];
   [task setArguments:args];
 
+  // Explicitly set standard input to prevent tasks from unexpectedly
+  // hanging by trying to read from an inherited stdin.
+  [task setStandardInput:[NSFileHandle fileHandleWithNullDevice]];
+
   NSPipe *outputPipe = [NSPipe pipe];
   [task setStandardOutput:outputPipe];
 
